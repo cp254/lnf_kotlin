@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorWhite">#FFffff</color>
+    <color name="colorBlack">#000000</color>
+    <color name="yellow">#F6B200</color>
+    <color name="skyblue">#00D6F6</color>
+    <color name="skybluedark">#00CBE9</color>
+    <color name="text_color_bold">#484848</color>
+    <color name="text_color_normal">#B3B3B3</color>
+    <color name="text_color_bold_light">#BBBBBB</color>
+    <color name="text_color_normal_darker">#6C6C6C</color>
+    <color name="selector_layout">#D8D8D8</color>
+    <color name="id_card">#DAFF92</color>
+    <color name="passport">#123B62</color>
+</resources>

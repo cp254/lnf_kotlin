@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="24dp"
+    android:id="@+id/background"
+    android:orientation="vertical"
+    android:background="@drawable/search_item_id_bg">
+
+    <ImageView
+        android:layout_width="45dp"
+        android:layout_height="35dp"
+        android:layout_marginBottom="4dp"
+        android:background="@color/colorBlack"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ID CARD"
+        android:textSize="18sp"
+        android:fontFamily="@font/montserrat_bold"
+        android:textColor="@color/text_color_bold"
+        android:layout_marginBottom="8dp"
+        android:id="@+id/doc_type"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No: 12233445"
+        android:fontFamily="@font/montserrat_semibold"
+        android:textColor="@color/text_color_bold"
+        android:id="@+id/doc_id"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name: John Doe"
+        android:fontFamily="@font/montserrat_bold"
+        android:textColor="@color/text_color_bold"
+        android:id="@+id/doc_name"/>
+
+</LinearLayout>
