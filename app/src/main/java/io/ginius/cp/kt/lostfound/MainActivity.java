@@ -202,14 +202,14 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
 
         if(cbSms.isChecked()){
             notificationType.add("EMAIL");
-            email = {"EMAIL"};
+           // email = {"EMAIL"};
         }
         if(cbSms.isChecked()){
             notificationType.add("SMS");
         }
         if(cbSms.isChecked() && cbEmail.isChecked()) {
             notificationType.add("EMAIL");
-            notificationType.addAll()
+            //notificationType.addAll()
 
         }
         JSONArray list = new JSONArray(notificationType);
