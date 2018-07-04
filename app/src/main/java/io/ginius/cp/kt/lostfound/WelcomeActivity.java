@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -16,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -136,13 +134,13 @@ public class WelcomeActivity extends AppCompatActivity {
                 btnNext.setVisibility(View.VISIBLE);
                 Window window = WelcomeActivity.this.getWindow();
                 if (Build.VERSION.SDK_INT >= 21)
-                    window.setStatusBarColor(ContextCompat.getColor( WelcomeActivity.this,R.color.skyblue));
+                    window.setStatusBarColor(ContextCompat.getColor( WelcomeActivity.this, R.color.skyblue));
 
             } else {
                 // still pages are left
                 Window window = WelcomeActivity.this.getWindow();
                 if (Build.VERSION.SDK_INT >= 21)
-                    window.setStatusBarColor(ContextCompat.getColor( WelcomeActivity.this,R.color.yellow));
+                    window.setStatusBarColor(ContextCompat.getColor( WelcomeActivity.this, R.color.yellow));
                 btnNext.setVisibility(View.INVISIBLE);
             }
         }

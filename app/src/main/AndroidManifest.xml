@@ -25,6 +25,22 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.SkyBlue">
         </activity>
+        <activity android:name=".CreateDocsOne"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.SkyBlue">
+        </activity>
+        <activity android:name=".CreateDocsTwo"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.SkyBlue">
+        </activity>
+        <activity android:name=".CreateDocsThree"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.SkyBlue">
+        </activity>
+        <activity android:name=".DocUpload"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.SkyBlue">
+        </activity>
     </application>
 
 </manifest>

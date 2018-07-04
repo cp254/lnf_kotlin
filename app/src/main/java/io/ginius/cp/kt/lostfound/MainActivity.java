@@ -3,9 +3,7 @@ package io.ginius.cp.kt.lostfound;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -17,11 +15,9 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,11 +26,9 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -42,23 +36,17 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import io.ginius.cp.kt.lostfound.models.Data;
-import io.ginius.cp.kt.lostfound.models.DocSearch;
-import io.ginius.cp.kt.lostfound.models.DocSearchReq;
 import io.ginius.cp.kt.lostfound.models.Result;
 
-import static com.android.volley.Request.Method.POST;
 import static com.android.volley.VolleyLog.TAG;
 
 public class MainActivity extends MainBaseActivity implements DocSearchAdapter.customButtonListener{
@@ -165,10 +153,6 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         });
 
 
-//        if(cbSms.isChecked() || cbEmail.isChecked())
-//            cont.setEnabled(true);
-//        else
-//            cont.setEnabled(false);
 
         cont.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -178,6 +162,14 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mActivity, CreateDocsOne.class);
+                startActivity(intent);
             }
         });
 
@@ -281,7 +273,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                     button.setVisibility(View.GONE);
                     Window window = MainActivity.this.getWindow();
                     if (Build.VERSION.SDK_INT >= 21)
-                        window.setStatusBarColor(ContextCompat.getColor( MainActivity.this,R.color.yellow));
+                        window.setStatusBarColor(ContextCompat.getColor( MainActivity.this, R.color.yellow));
                     toolbar.setBackgroundResource(R.color.yellow);
                     desc.setText(getString(R.string.no_results) +" "+idQuery);
                     tv.setText("\""+idQuery+"\"");
@@ -289,7 +281,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 }else {
                     Window window = MainActivity.this.getWindow();
                     if (Build.VERSION.SDK_INT >= 21)
-                        window.setStatusBarColor(ContextCompat.getColor( MainActivity.this,R.color.skyblue));
+                        window.setStatusBarColor(ContextCompat.getColor( MainActivity.this, R.color.skyblue));
                     toolbar.setBackgroundResource(R.color.skyblue);
                     desc.setVisibility(View.VISIBLE);
                     nsv.setVisibility(View.GONE);
@@ -402,17 +394,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
 
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_history:
-                break;
-            default:
-                break;
-        }
 
-        return true;
-    }
 
     @Override
     protected void onPause() {
