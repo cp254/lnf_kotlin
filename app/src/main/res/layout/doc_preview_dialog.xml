@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/bg"
+    app:corner_radius="24dp"
+    >
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:id="@+id/image">
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:id="@+id/expand"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/ic_scale_white"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:orientation="vertical"
+        android:layout_centerVertical="true">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_id_white"
+            android:layout_above="@+id/doc_type"
+            android:layout_marginTop="100dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:id="@+id/doc_icon"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/doc_type"
+            android:text="ID CARD"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:textColor="@color/colorWhite"
+            android:layout_above="@id/doc_id"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ID Number"
+            android:textColor="@color/colorWhite"
+            android:layout_marginLeft="16dp"
+            android:layout_above="@id/doc_names"
+            android:layout_marginBottom="8dp"
+            android:id="@+id/doc_id"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:textColor="@color/colorWhite"
+            android:text="Names"
+            android:id="@+id/doc_names"
+            android:layout_marginLeft="16dp"
+            android:layout_above="@id/button_pay"/>
+
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:textAllCaps="false"
+            android:text="Is this yours?"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:textColor="@color/colorWhite"
+            android:id="@+id/button_pay"
+            android:background="@drawable/rounded_corners_blue_bg"/>
+
+
+    </LinearLayout>
+    </RelativeLayout>
+
+
+</com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>

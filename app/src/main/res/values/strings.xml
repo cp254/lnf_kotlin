@@ -7,7 +7,7 @@
     <string name="baseurl">http://18.216.65.139:3000/mobile/v1</string>
     <string name="email">Email</string>
     <string name="phone">Phone</string>
-    <string name="password">Password</string>
+    <string name="password">Pin</string>
     <string name="statuscode">statuscode</string>
     <string name="result">result</string>
     <string name="statusname">statusname</string>
