@@ -58,6 +58,8 @@ public class CreateDocsTwo extends MainBaseActivity{
 
         pickuplocation = findViewById(R.id.et_fname);
 
+        String s = getIntent().getStringExtra("EXTRA_SESSION_ID");
+
         next = findViewById(R.id.btn_next);
         btn_gps = findViewById(R.id.btn_gps);
         mActivity = CreateDocsTwo.this;

@@ -95,6 +95,7 @@ public class CreateDocsOne extends MainBaseActivity{
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mActivity, CreateDocsTwo.class);
+                intent.putExtra("EXTRA_SESSION_ID", "");
                 startActivity(intent);
 
             }

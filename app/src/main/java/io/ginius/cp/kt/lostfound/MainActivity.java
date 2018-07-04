@@ -26,6 +26,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -94,6 +95,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         tv = findViewById(R.id.tv_id);
         no_result = findViewById(R.id.not_found);
         mActivity = MainActivity.this;
+        cont.setVisibility(View.GONE);
         notificationType = new ArrayList<String>();
         sv.setIconified(false);
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -121,13 +123,19 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
 
             @Override
             public void onClick(View v) {
-                cbSms.setChecked(true);
+                notificationType.clear();
                 if(cbSms.isChecked()){
-                    Toast.makeText(MainActivity.this, "checked", Toast.LENGTH_SHORT).show();
-                    System.out.println("Checked");
+                    notificationType.add("SMS");
+
                 }else{
-                    Toast.makeText(MainActivity.this, "Unchecked", Toast.LENGTH_SHORT).show();
-                    System.out.println("Un-Checked");
+                    notificationType.clear();
+
+                }
+
+                if(cbEmail.isChecked() || cbSms.isChecked()){
+                    cont.setVisibility(View.VISIBLE);
+                }else{
+                    cont.setVisibility(View.GONE);
                 }
             }
         });
@@ -136,19 +144,17 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
 
             @Override
             public void onClick(View v) {
-                // TODO Auto-generated method stub
+                notificationType.clear();
                 if(cbEmail.isChecked()){
-                    cont.setEnabled(true);
+                    notificationType.add("EMAIL");
                 }else{
-                    cont.setEnabled(false);
+                    notificationType.clear();
                 }
-//                if(cbEmail.isChecked()){
-//                    Toast.makeText(MainActivity.this, "checked", Toast.LENGTH_SHORT).show();
-//                    System.out.println("Checked");
-//                }else{
-//                    Toast.makeText(MainActivity.this, "Unchecked", Toast.LENGTH_SHORT).show();
-//                    System.out.println("Un-Checked");
-//                }
+                if(cbEmail.isChecked() || cbSms.isChecked()){
+                    cont.setVisibility(View.VISIBLE);
+                }else{
+                    cont.setVisibility(View.GONE);
+                }
             }
         });
 
@@ -157,6 +163,60 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         cont.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final Dialog dialog = new Dialog(MainActivity.this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.register);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.setCanceledOnTouchOutside(false);
+                RelativeLayout bg =  dialog.findViewById(R.id.image);
+                EditText phone =  dialog.findViewById(R.id.et_contact);
+                EditText email =  dialog.findViewById(R.id.et_email);
+                EditText password =  dialog.findViewById(R.id.et_password);
+                TextView login =  dialog.findViewById(R.id.tvlogin);
+                Button submit =  dialog.findViewById(R.id.btn_submit);
+
+                submit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+
+
+                    }
+                });
+
+                login.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                        final Dialog dialog = new Dialog(MainActivity.this);
+                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                        dialog.setContentView(R.layout.login);
+                        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        dialog.setCanceledOnTouchOutside(false);
+                        RelativeLayout bg =  dialog.findViewById(R.id.image);
+                        EditText phone =  dialog.findViewById(R.id.et_contact);
+                        //EditText email =  dialog.findViewById(R.id.et_email);
+                        EditText password =  dialog.findViewById(R.id.et_password);
+                        //TextView login =  dialog.findViewById(R.id.tvlogin);
+                        Button submit =  dialog.findViewById(R.id.btn_submit);
+
+                        submit.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                dialog.dismiss();
+
+
+                            }
+                        });
+
+                        dialog.show();
+
+
+                    }
+                });
+
+                dialog.show();
+
                 try {
                     webServiceRequest(POST, getString(R.string.service_url), subscribeT0(idQuery), "subscribe");
                 } catch (JSONException e) {
@@ -191,19 +251,6 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         dataItem.put(getString(R.string.doc_ref), acct);
         dataItem.put("doc_type", "NATIONAL_ID");
         dataItem.put("user_ref", "5");
-
-        if(cbSms.isChecked()){
-            notificationType.add("EMAIL");
-           // email = {"EMAIL"};
-        }
-        if(cbSms.isChecked()){
-            notificationType.add("SMS");
-        }
-        if(cbSms.isChecked() && cbEmail.isChecked()) {
-            notificationType.add("EMAIL");
-            //notificationType.addAll()
-
-        }
         JSONArray list = new JSONArray(notificationType);
         dataItem.put("notification_type", list);
         dataW.put(getString(R.string.data), dataItem);
