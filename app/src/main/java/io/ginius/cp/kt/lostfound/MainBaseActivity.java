@@ -63,6 +63,10 @@ public class MainBaseActivity extends AppCompatActivity {
     public static final int POST = Request.Method.POST;
     public static final int GET = Request.Method.GET;
 
+    public static final String DOC_ID = "";
+    public static String USERID = "";
+    public static String DOCTYPE = "";
+
     private static final String TAG = MainBaseActivity.class.getSimpleName();
     private static final int PERMISSION_REQUEST_PHONE_STATE = 200;
 

@@ -16,6 +16,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
@@ -24,6 +25,8 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -32,6 +35,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,9 +49,12 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import io.ginius.cp.kt.lostfound.models.Result;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static com.android.volley.VolleyLog.TAG;
 
 public class MainActivity extends MainBaseActivity implements DocSearchAdapter.customButtonListener{
@@ -62,15 +69,13 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
     private Context mContext;
     private Activity mActivity;
     ConstraintLayout header;
-    String idQuery = "";
+    String idQuery = "", contact="", email="", password="";
     InputMethodManager imm;
     RelativeLayout button;
     LinearLayout no_result, cont;
     NestedScrollView nsv;
+    Map<String, String> typeMap;
     CheckBox cbSms, cbEmail;
-    String[] both = new String[2];
-    String[] email = new String[1];
-    String[] sms = new String[1];
     ArrayList<String> notificationType;
 
 
@@ -169,17 +174,39 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialog.setCanceledOnTouchOutside(false);
                 RelativeLayout bg =  dialog.findViewById(R.id.image);
-                EditText phone =  dialog.findViewById(R.id.et_contact);
-                EditText email =  dialog.findViewById(R.id.et_email);
-                EditText password =  dialog.findViewById(R.id.et_password);
+                final EditText ETphone =  dialog.findViewById(R.id.et_contact);
+                final EditText ETemail =  dialog.findViewById(R.id.et_email);
+                final EditText ETpassword =  dialog.findViewById(R.id.et_password);
                 TextView login =  dialog.findViewById(R.id.tvlogin);
                 Button submit =  dialog.findViewById(R.id.btn_submit);
+
+
 
                 submit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        dialog.dismiss();
+//                        if(email != "" && password != "" && contact != "") {
+                        if(TextUtils.isEmpty(ETemail.getText().toString()))
+                            ETemail.setError("Please enter an email address");
 
+                        else
+                            email = ETemail.getText().toString().trim();
+                        if(TextUtils.isEmpty(ETphone.getText().toString()))
+                            ETphone.setError("Please enter an email address");
+                        else
+                            contact = ETphone.getText().toString().trim();
+                        if(TextUtils.isEmpty(ETpassword.getText().toString()))
+                            ETpassword.setError("Please enter an email address");
+                        else
+                            password = ETpassword.getText().toString().trim();
+
+                            try {
+                                webServiceRequest(POST, getString(R.string.service_url), register(), "register");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+//                        } else
+                            dialog.dismiss();
 
                     }
                 });
@@ -193,7 +220,6 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                         dialog.setContentView(R.layout.login);
                         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                         dialog.setCanceledOnTouchOutside(false);
-                        RelativeLayout bg =  dialog.findViewById(R.id.image);
                         EditText phone =  dialog.findViewById(R.id.et_contact);
                         //EditText email =  dialog.findViewById(R.id.et_email);
                         EditText password =  dialog.findViewById(R.id.et_password);
@@ -217,11 +243,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
 
                 dialog.show();
 
-                try {
-                    webServiceRequest(POST, getString(R.string.service_url), subscribeT0(idQuery), "subscribe");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+
             }
         });
 
@@ -236,6 +258,17 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
             //
 
     }
+
+    boolean validate(){
+        boolean valid;
+        if(contact== null || password== null || email== null){
+            valid = false;}
+        else
+            valid = true;
+
+
+        return valid;
+    }
     public JSONObject searchId(String acct) throws JSONException {
         JSONObject dataW = new JSONObject();
         JSONObject dataItem = new JSONObject();
@@ -245,16 +278,29 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         return dataW;
     }
 
-    public JSONObject subscribeT0(String acct) throws JSONException {
+    public JSONObject subscribeT0(String acct, String docType) throws JSONException {
         JSONObject dataW = new JSONObject();
         JSONObject dataItem = new JSONObject();
         dataItem.put(getString(R.string.doc_ref), acct);
-        dataItem.put("doc_type", "NATIONAL_ID");
-        dataItem.put("user_ref", "5");
+        dataItem.put("doc_type", docType);
+        dataItem.put("user_ref", USERID);
         JSONArray list = new JSONArray(notificationType);
         dataItem.put("notification_type", list);
         dataW.put(getString(R.string.data), dataItem);
         dataW.put(getString(R.string.command), "subscribe");
+        Log.e("test", dataW.toString(4));
+        return dataW;
+    }
+
+    public JSONObject register () throws JSONException {
+        JSONObject dataW = new JSONObject();
+        JSONObject dataItem = new JSONObject();
+        dataItem.put(getString(R.string.contact), contact);
+        dataItem.put(getString(R.string.email), email);
+        dataItem.put("password", password);
+        dataItem.put("reg_by",  getString(R.string.self));
+        dataW.put(getString(R.string.data), dataItem);
+        dataW.put(getString(R.string.command), getString(R.string.register_user));
         Log.e("test", dataW.toString(4));
         return dataW;
     }
@@ -283,6 +329,10 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                             Log.i(TAG + " WebService response", response.toString());
                             if (reqIdentifier.equalsIgnoreCase("search_document"))
                                 docSearchResponse(response);
+                            else if (reqIdentifier.equalsIgnoreCase("register"))
+                                registerResponse(response);
+                            else if (reqIdentifier.equalsIgnoreCase("subscribe"))
+                                subscribeResponse(response);
 
 
                         } catch (Exception ex) {
@@ -293,7 +343,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-//                pd.dismiss();
+                pd.dismiss();
                 createErrorDetailDialog(MainActivity.this, error, "Error").show();
                 Log.e(TAG, error.toString());
             }
@@ -307,7 +357,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         try {
-            Log.i(TAG, jsonObject.toString());
+            Log.e(TAG, jsonObject.toString());
             if (jsonObject.getInt(getString(R.string.statuscode)) == SUCCESS) {
                 JSONArray documentList = jsonObject.getJSONArray(getString(R.string.result));
 
@@ -322,7 +372,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                     if (Build.VERSION.SDK_INT >= 21)
                         window.setStatusBarColor(ContextCompat.getColor( MainActivity.this, R.color.yellow));
                     toolbar.setBackgroundResource(R.color.yellow);
-                    desc.setText(getString(R.string.no_results) +" "+idQuery);
+                    //desc.setText(getString(R.string.no_results) +" "+idQuery);
                     tv.setText("\""+idQuery+"\"");
                     rv.setVisibility(View.GONE);
                 }else {
@@ -336,6 +386,119 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                     rv.setVisibility(View.VISIBLE);
                     button.setVisibility(View.VISIBLE);
                 }
+            } else {
+                String respMsg = jsonObject.getString(getString(R.string.statusname));
+                Toast.makeText(this, respMsg, Toast.LENGTH_LONG).show();
+
+            }
+        } catch (Exception ex) {
+            Log.e(TAG + " error", ex.toString());
+            Toast.makeText(this, ex.toString(), Toast.LENGTH_LONG).show();
+            ex.printStackTrace();
+//            resetLayout();
+        }
+    }
+
+    public void registerResponse(JSONObject jsonObject) {
+        pd.dismiss();
+        getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        try {
+            Log.e("t", jsonObject.toString());
+            if (jsonObject.getInt(getString(R.string.statuscode)) == SUCCESS) {
+                USERID = String.valueOf(jsonObject.getInt(getString(R.string.result)));
+                final Dialog dialog = new Dialog(MainActivity.this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.dialog_enter_id_type);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.setCanceledOnTouchOutside(false);
+                final Spinner docTypeSpinner = dialog.findViewById(R.id.spinner_doc_type);
+                Button submit = dialog.findViewById(R.id.btn_next);
+                ArrayList<String> TypeList = new ArrayList<String>();
+                TypeList.add("Tap to select type");
+                TypeList.add(getString(R.string.national_id));
+                TypeList.add(getString(R.string.passport));
+                TypeList.add(getString(R.string.dl));
+                TypeList.add(getString(R.string.others));
+                typeMap = new HashMap<>();
+                typeMap.put(getString(R.string.national_id), "NATIONAL_ID");
+                typeMap.put(getString(R.string.passport), "PASSPORT");
+                typeMap.put(getString(R.string.dl), "DRIVING_LICENSE");
+                typeMap.put(getString(R.string.others), "OTHERS");
+                ArrayAdapter<String> arrayAdapterLeaves = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, TypeList);
+                docTypeSpinner.setAdapter(arrayAdapterLeaves);
+                docTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        if (i > 0) {
+                            DOCTYPE = typeMap.get(docTypeSpinner.getSelectedItem().toString());
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                submit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+
+                        try {
+                            webServiceRequest(POST, getString(R.string.service_url), subscribeT0(idQuery, DOCTYPE), "subscribe");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                });
+
+                dialog.show();
+            }
+
+        }catch (Exception e){
+
+        }
+
+    }
+
+    public void subscribeResponse(JSONObject jsonObject) {
+        pd.dismiss();
+        getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        try {
+            Log.e(TAG, jsonObject.toString());
+            if (jsonObject.getInt(getString(R.string.statuscode)) == SUCCESS) {
+                final Dialog dialog = new Dialog(MainActivity.this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.success_dialog);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.setCanceledOnTouchOutside(false);
+                TextView text =  dialog.findViewById(R.id.text);
+                text.setText(jsonObject.getString(getString(R.string.statusname)));
+                Button submit =  dialog.findViewById(R.id.btn_next);
+
+                submit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                        Window window = MainActivity.this.getWindow();
+                        if (Build.VERSION.SDK_INT >= 21)
+                            window.setStatusBarColor(ContextCompat.getColor( MainActivity.this, R.color.skyblue));
+                        toolbar.setBackgroundResource(R.color.skyblue);
+                        desc.setVisibility(View.VISIBLE);
+                        nsv.setVisibility(View.GONE);
+                        rv.setVisibility(View.GONE);
+                        button.setVisibility(View.VISIBLE);
+
+
+                    }
+                });
+
+                dialog.show();
             } else {
                 String respMsg = jsonObject.getString(getString(R.string.statusname));
                 Toast.makeText(this, respMsg, Toast.LENGTH_LONG).show();
