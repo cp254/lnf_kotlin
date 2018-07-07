@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -44,6 +45,7 @@ public class CreateDocsTwo extends MainBaseActivity{
     InputMethodManager imm;
 
     EditText pickuplocation;
+    Boolean gpsLocation = false;
     Button next, btn_gps;
 
 
@@ -56,7 +58,7 @@ public class CreateDocsTwo extends MainBaseActivity{
         toolbar = findViewById(R.id.toolbar);
         mContext = getApplicationContext();
 
-        pickuplocation = findViewById(R.id.et_fname);
+        pickuplocation = findViewById(R.id.et_pickup);
 
         String s = getIntent().getStringExtra("EXTRA_SESSION_ID");
 
@@ -68,8 +70,9 @@ public class CreateDocsTwo extends MainBaseActivity{
 
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mActivity, CreateDocsThree.class);
-                startActivity(intent);
+                gpsLocation = true;
+//                Intent intent = new Intent(mActivity, CreateDocsThree.class);
+//                startActivity(intent);
 
             }
         });
@@ -79,13 +82,33 @@ public class CreateDocsTwo extends MainBaseActivity{
 
             @Override
             public void onClick(View v) {
+                if(validate()){
                 Intent intent = new Intent(mActivity, CreateDocsThree.class);
+                    intent.putExtra("pick_up", pickuplocation.getText().toString().trim());
+                    intent.putExtra("lat", "");
+                    intent.putExtra("lat", "");
                 startActivity(intent);
+                }
 
             }
         });
 
 
+    }
+
+    boolean validate(){
+        boolean valid = true;
+        if(!(gpsLocation)) {
+            if (TextUtils.isEmpty(pickuplocation.getText().toString())) {
+                pickuplocation.setError("Please enter first name");
+                valid = false;
+            }
+        }
+
+
+
+
+        return valid;
     }
     public JSONObject searchId(String acct) throws JSONException {
         JSONObject dataW = new JSONObject();

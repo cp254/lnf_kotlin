@@ -16,6 +16,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +24,8 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -45,6 +48,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import io.ginius.cp.kt.lostfound.models.Result;
 
@@ -63,6 +67,7 @@ public class CreateDocsOne extends MainBaseActivity{
     private Context mContext;
     private Activity mActivity;
     InputMethodManager imm;
+    Map<String, String> typeMap;
 
     EditText fname, lname, phone, details, pickuplocation, docid, createdby;
     Spinner docType;
@@ -85,23 +90,90 @@ public class CreateDocsOne extends MainBaseActivity{
         docid = findViewById(R.id.et_doc_id);
         details = findViewById(R.id.et_doc_details);
         next = findViewById(R.id.btn_next);
+        docType = findViewById(R.id.spinner_doc_type);
         mActivity = CreateDocsOne.this;
 
+        ArrayList<String> TypeList = new ArrayList<String>();
+        TypeList.add("Tap to select type");
+        TypeList.add(getString(R.string.national_id));
+        TypeList.add(getString(R.string.passport));
+        TypeList.add(getString(R.string.dl));
+        TypeList.add(getString(R.string.others));
+        typeMap = new HashMap<>();
+        typeMap.put(getString(R.string.national_id), "NATIONAL_ID");
+        typeMap.put(getString(R.string.passport), "PASSPORT");
+        typeMap.put(getString(R.string.dl), "DRIVING_LICENSE");
+        typeMap.put(getString(R.string.others), "OTHERS");
+        ArrayAdapter<String> arrayAdapterLeaves = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, TypeList);
+        docType.setAdapter(arrayAdapterLeaves);
+        docType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if (i > 0) {
+                    DOCTYPE = typeMap.get(docType.getSelectedItem().toString());
+                }
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
+            }
+        });
 
         next.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mActivity, CreateDocsTwo.class);
-                intent.putExtra("EXTRA_SESSION_ID", "");
-                startActivity(intent);
+                if(validate()){
+                    Intent intent = new Intent(mActivity, CreateDocsTwo.class);
+                    intent.putExtra("doc_type", DOCTYPE);
+                    intent.putExtra("f_name", fname.getText().toString().trim());
+                    intent.putExtra("l_name", lname.getText().toString().trim());
+                    intent.putExtra("doc_id", docid.getText().toString().trim());
+                    intent.putExtra("comments", details.getText().toString().trim());
+                    startActivity(intent);
+                }
+
 
             }
         });
 
 
+    }
+
+    boolean validate(){
+        boolean valid = true;
+//        fname = findViewById(R.id.et_fname);
+//        lname = findViewById(R.id.et_lnames);
+//        docid = findViewById(R.id.et_doc_id);
+//        details = findViewById(R.id.et_doc_details);
+        if(TextUtils.isEmpty(fname.getText().toString())){
+            fname.setError("Please enter first name");
+            valid = false;
+        }
+
+        if(TextUtils.isEmpty(fname.getText().toString())){
+            fname.setError("Please enter first name");
+            valid = false;
+        }
+
+        if(TextUtils.isEmpty(lname.getText().toString())){
+            lname.setError("Please enter first name");
+            valid = false;
+        }
+
+        if(TextUtils.isEmpty(docid.getText().toString())){
+            docid.setError("Please enter first name");
+            valid = false;
+        }
+        
+        if(docType.getSelectedItemPosition() == 0){
+            Toast.makeText(mActivity, "Please selec document type", Toast.LENGTH_SHORT).show();
+            valid = false;
+        }
+
+
+        return valid;
     }
     public JSONObject searchId(String acct) throws JSONException {
         JSONObject dataW = new JSONObject();
