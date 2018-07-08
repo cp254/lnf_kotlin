@@ -2,8 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.ginius.cp.kt.lostfound">
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -41,6 +45,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.SkyBlue">
         </activity>
+
+        <service
+            android:name=".FetchAddressIntentService"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

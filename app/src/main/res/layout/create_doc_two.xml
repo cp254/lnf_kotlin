@@ -111,6 +111,7 @@
             android:text="share gps location"
             android:background="@drawable/rounded_corners_blue_bg"
             android:textAllCaps="false"
+            android:onClick="fetchAddressButtonHander"
             android:textColor="@color/colorWhite"
             android:fontFamily="@font/montserrat_extrabold"
             android:layout_width="match_parent"

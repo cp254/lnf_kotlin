@@ -69,7 +69,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
     private Context mContext;
     private Activity mActivity;
     ConstraintLayout header;
-    String idQuery = "", contact="", email="", password="";
+    String idQuery = "", contact="", email="", password="", name  = "";
     InputMethodManager imm;
     RelativeLayout button;
     LinearLayout no_result, cont;
@@ -77,6 +77,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
     Map<String, String> typeMap;
     CheckBox cbSms, cbEmail;
     ArrayList<String> notificationType;
+    Boolean foundID = false;
 
 
 
@@ -250,8 +251,91 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mActivity, CreateDocsOne.class);
+                foundID = true;
+                Intent intent = new Intent(mActivity, DocUpload.class);
                 startActivity(intent);
+//                final Dialog dialog = new Dialog(MainActivity.this);
+//                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//                dialog.setContentView(R.layout.register);
+//                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//                dialog.setCanceledOnTouchOutside(false);
+//                RelativeLayout bg =  dialog.findViewById(R.id.image);
+//                final EditText ETphone =  dialog.findViewById(R.id.et_contact);
+//                final EditText ETnames =  dialog.findViewById(R.id.et_names);
+//                final EditText ETemail =  dialog.findViewById(R.id.et_email);
+//                final EditText ETpassword =  dialog.findViewById(R.id.et_password);
+//                TextView login =  dialog.findViewById(R.id.tvlogin);
+//                Button submit =  dialog.findViewById(R.id.btn_submit);
+//
+//
+//
+//                submit.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+////                        if(email != "" && password != "" && contact != "") {
+//                        if(TextUtils.isEmpty(ETemail.getText().toString()))
+//                            ETemail.setError("Please enter an email address");
+//
+//                        else
+//                            email = ETemail.getText().toString().trim();
+//                        if(TextUtils.isEmpty(ETphone.getText().toString()))
+//                            ETphone.setError("Please enter an email address");
+//                        else
+//                            contact = ETphone.getText().toString().trim();
+//                        if(TextUtils.isEmpty(ETpassword.getText().toString()))
+//                            ETpassword.setError("Please enter an email address");
+//                        else
+//                            password = ETpassword.getText().toString().trim();
+//                        if(TextUtils.isEmpty(ETnames.getText().toString()))
+//                            ETnames.setError("Please enter your name");
+//                        else
+//                            name = ETnames.getText().toString().trim();
+//
+//                        try {
+//                            webServiceRequest(POST, getString(R.string.service_url), register(), "register");
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+////                        } else
+//                        dialog.dismiss();
+//
+//                    }
+//                });
+//
+//                login.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        dialog.dismiss();
+//                        final Dialog dialog = new Dialog(MainActivity.this);
+//                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//                        dialog.setContentView(R.layout.login);
+//                        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//                        dialog.setCanceledOnTouchOutside(false);
+//                        EditText phone =  dialog.findViewById(R.id.et_contact);
+//                        //EditText email =  dialog.findViewById(R.id.et_email);
+//                        EditText password =  dialog.findViewById(R.id.et_password);
+//                        //TextView login =  dialog.findViewById(R.id.tvlogin);
+//                        Button submit =  dialog.findViewById(R.id.btn_submit);
+//
+//                        submit.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View view) {
+//                                dialog.dismiss();
+//
+//
+//                            }
+//                        });
+//
+//                        dialog.show();
+//
+//
+//                    }
+//                });
+//
+//                dialog.show();
+
+
+
             }
         });
 
@@ -407,6 +491,13 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
             Log.e("t", jsonObject.toString());
             if (jsonObject.getInt(getString(R.string.statuscode)) == SUCCESS) {
                 USERID = String.valueOf(jsonObject.getInt(getString(R.string.result)));
+                if(foundID){
+                    Intent intent = new Intent(mActivity, CreateDocsOne.class);
+                    intent.putExtra("user_id", USERID);
+                    intent.putExtra("creator_name", name);
+                    intent.putExtra("user_contact", contact);
+                    startActivity(intent);
+                }
                 final Dialog dialog = new Dialog(MainActivity.this);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setContentView(R.layout.dialog_enter_id_type);
@@ -604,12 +695,17 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
 
     }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        foundID = false;
+    }
 
     @Override
     protected void onPause() {
         super.onPause();
         cbEmail.setChecked(false);
         cbSms.setChecked(false);
+        foundID = false;
     }
 }

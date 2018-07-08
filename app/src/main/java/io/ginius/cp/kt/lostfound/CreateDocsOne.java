@@ -68,7 +68,7 @@ public class CreateDocsOne extends MainBaseActivity{
     private Activity mActivity;
     InputMethodManager imm;
     Map<String, String> typeMap;
-
+    String userid, username, userphone;
     EditText fname, lname, phone, details, pickuplocation, docid, createdby;
     Spinner docType;
     Button next;
@@ -92,6 +92,14 @@ public class CreateDocsOne extends MainBaseActivity{
         next = findViewById(R.id.btn_next);
         docType = findViewById(R.id.spinner_doc_type);
         mActivity = CreateDocsOne.this;
+
+        try {
+            userid = getIntent().getStringExtra("user_id");
+            username = getIntent().getStringExtra("creator_name");
+            userphone = getIntent().getStringExtra("user_contact");
+        } catch (Exception e) {
+            onBackPressed();
+        }
 
         ArrayList<String> TypeList = new ArrayList<String>();
         TypeList.add("Tap to select type");
@@ -131,6 +139,9 @@ public class CreateDocsOne extends MainBaseActivity{
                     intent.putExtra("l_name", lname.getText().toString().trim());
                     intent.putExtra("doc_id", docid.getText().toString().trim());
                     intent.putExtra("comments", details.getText().toString().trim());
+                    intent.putExtra("user_id", userid);
+                    intent.putExtra("creator_name", username);
+                    intent.putExtra("user_phone", userphone);
                     startActivity(intent);
                 }
 
