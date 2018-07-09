@@ -64,7 +64,7 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
     ArrayList<HashMap<String, String>> transfersList;
     Toolbar toolbar;
     Result docObjList[];
-    ArrayList<Double> location;
+    ArrayList<Double> loc;
     private Context mContext;
     private Activity mActivity;
     InputMethodManager imm;
@@ -108,10 +108,11 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
             doctype = getIntent().getStringExtra("doc_type");
             userid = getIntent().getStringExtra("user_id");
             username = getIntent().getStringExtra("creator_name");
-            userphone = getIntent().getStringExtra("user_contact");
+            userphone = getIntent().getStringExtra("user_phone");
         } catch (Exception e) {
             onBackPressed();
         }
+        loc = new ArrayList<Double>();
         next = findViewById(R.id.btn_next);
         btn_gps = findViewById(R.id.btn_gps);
         mActivity = CreateDocsTwo.this;
@@ -174,10 +175,10 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
         JSONObject dataW = new JSONObject();
         JSONObject dataItem = new JSONObject();
         dataItem.put("doc_type", doctype);
-        dataItem.put("doc_unique_id", doctype);
-        dataItem.put("doc_name", docid);
+        dataItem.put("doc_unique_id", docid);
+        dataItem.put("doc_name", doctype);
         dataItem.put("doc_details", comments);
-        JSONArray list = new JSONArray(location);
+        JSONArray list = new JSONArray(loc);
         dataItem.put("coordinates", list);
         dataItem.put("created_by", username);
         dataItem.put("pick_up_location", pickuplocation.getText().toString());
@@ -234,7 +235,7 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         try {
             Log.e("cdd", jsonObject.toString());
-            //if (jsonObject.getInt(getString(R.string.statuscode)) == SUCCESS) {
+            if (jsonObject.getInt(getString(R.string.statuscode)) == SUCCESS) {
                 final String result = jsonObject.getString(getString(R.string.result));
                 final Dialog dialog = new Dialog(this);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -259,19 +260,15 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
 
 
 
-            //} else {
-//                String respMsg = jsonObject.getString(getString(R.string.statusname));
-//                Toast.makeText(this, respMsg, Toast.LENGTH_LONG).show();
-//                Utils.dialogConfig(this, respMsg);
-
-//                Window window = CreateDocsThree.this.getWindow();
-//                if (Build.VERSION.SDK_INT >= 21)
-//                    window.setStatusBarColor(ContextCompat.getColor( CreateDocsThree.this, R.color.yellow));
-//                toolbar.setBackgroundResource(R.color.yellow);
+            } else {
+                String respMsg = jsonObject.getString("error_message");
+                ;
+                Utils.dialogConfig(this, respMsg);
 
 
 
-//            }
+
+            }
         } catch (Exception ex) {
             Log.e(TAG + " error", ex.toString());
             Toast.makeText(this, ex.toString(), Toast.LENGTH_LONG).show();
@@ -327,6 +324,8 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
         final String result = "Latitude: " + location.getLatitude() +
                 " Longitude: " + location.getLongitude();
 
+        loc.add(latitude);
+        loc.add(longitude);
         geocoder = new Geocoder(this);
         try {
             pd.dismiss();

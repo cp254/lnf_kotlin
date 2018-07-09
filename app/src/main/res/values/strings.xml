@@ -10,6 +10,7 @@
     <string name="password">Pin</string>
     <string name="statuscode">statuscode</string>
     <string name="result">result</string>
+    <string name="user">user</string>
     <string name="statusname">statusname</string>
     <string name="data">data</string>
     <string name="doc_ref">doc_ref</string>

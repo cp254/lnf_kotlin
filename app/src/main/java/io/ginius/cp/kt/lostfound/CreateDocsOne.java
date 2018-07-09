@@ -179,7 +179,7 @@ public class CreateDocsOne extends MainBaseActivity{
         }
         
         if(docType.getSelectedItemPosition() == 0){
-            Toast.makeText(mActivity, "Please selec document type", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, "Please select document type", Toast.LENGTH_SHORT).show();
             valid = false;
         }
 

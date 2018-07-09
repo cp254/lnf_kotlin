@@ -103,7 +103,7 @@ public class DocUpload extends MainBaseActivity{
             public void onClick(View v) {
                 try {
                     webServiceRequest(POST, getString(R.string.service_url), uploadImage(),
-                            "create_document");
+                            "upload_document");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -148,7 +148,7 @@ public class DocUpload extends MainBaseActivity{
 
                         try {
                             Log.i(TAG + " WebService response", response.toString());
-                            if (reqIdentifier.equalsIgnoreCase("search_document"))
+                            if (reqIdentifier.equalsIgnoreCase("upload_document"))
                                 docImgUploadResponse(response);
 
 
