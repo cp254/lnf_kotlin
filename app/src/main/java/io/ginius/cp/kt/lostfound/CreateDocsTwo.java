@@ -76,8 +76,8 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
     EditText pickuplocation;
     Boolean gpsLocation = false;
     Button next, btn_gps;
-    String userid, username, userphone;
-    String fname, lname, docid, comments, doctype, mAddressOutput;
+    private io.ginius.cp.kt.lostfound.PreferenceManager prefManager;
+
     private MyLocation myLocation = null;
     private static final String[] INITIAL_PERMS = {
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -98,20 +98,10 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
 
         pickuplocation = findViewById(R.id.et_pickup);
         myLocation = new MyLocation();
+        prefManager = new io.ginius.cp.kt.lostfound.PreferenceManager(this);
 
 
-        try {
-            fname = getIntent().getStringExtra("f_name");
-            lname = getIntent().getStringExtra("l_name");
-            docid = getIntent().getStringExtra("doc_id");
-            comments = getIntent().getStringExtra("comments");
-            doctype = getIntent().getStringExtra("doc_type");
-            userid = getIntent().getStringExtra("user_id");
-            username = getIntent().getStringExtra("creator_name");
-            userphone = getIntent().getStringExtra("user_phone");
-        } catch (Exception e) {
-            onBackPressed();
-        }
+
         loc = new ArrayList<Double>();
         next = findViewById(R.id.btn_next);
         btn_gps = findViewById(R.id.btn_gps);
@@ -174,17 +164,17 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
     public JSONObject createDoc() throws JSONException {
         JSONObject dataW = new JSONObject();
         JSONObject dataItem = new JSONObject();
-        dataItem.put("doc_type", doctype);
-        dataItem.put("doc_unique_id", docid);
-        dataItem.put("doc_name", doctype);
-        dataItem.put("doc_details", comments);
+        dataItem.put("doc_type", prefManager.getDocType());
+        dataItem.put("doc_unique_id", prefManager.getDocId());
+        dataItem.put("doc_name", prefManager.getDocName());
+        dataItem.put("doc_details", prefManager.getDocDetails());
         JSONArray list = new JSONArray(loc);
         dataItem.put("coordinates", list);
-        dataItem.put("created_by", username);
+        dataItem.put("created_by", prefManager.getUserName());
         dataItem.put("pick_up_location", pickuplocation.getText().toString());
-        dataItem.put("foundby_contact", userphone);
-        dataItem.put("doc_fname", fname);
-        dataItem.put("doc_lname", lname);
+        dataItem.put("foundby_contact", prefManager.getUserPhoneNumber());
+        dataItem.put("doc_fname", prefManager.getDocFname());
+        dataItem.put("doc_lname", prefManager.getDocLname());
         dataW.put(getString(R.string.data), dataItem);
         dataW.put(getString(R.string.command), "create_document");
         return dataW;
@@ -249,9 +239,7 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
                     public void onClick(View view) {
                         dialog.dismiss();
                         Intent intent = new Intent(mActivity, DocUpload.class);
-                        intent.putExtra("doc_res", result);
-                        intent.putExtra("user_id", userid);
-                        intent.putExtra("image_name", fname+"_"+lname+"_"+docid);
+                        prefManager.setDocRef(result);
                         startActivity(intent);
 //
                     }

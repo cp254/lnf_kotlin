@@ -3,6 +3,7 @@ package io.ginius.cp.kt.lostfound;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -71,15 +72,17 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
     private Context mContext;
     private Activity mActivity;
     ConstraintLayout header;
-    String idQuery = "", contact = "", email = "", password = "", name = "", docNum = "", contct = "", pn = "";
+    String idQuery = "", contact = "", email = "", password = "", name = "", docNum = "";
     InputMethodManager imm;
     RelativeLayout button;
     LinearLayout no_result, cont;
     NestedScrollView nsv;
     Map<String, String> typeMap;
     CheckBox cbSms, cbEmail;
+    String OTP;
     ArrayList<String> notificationType;
-    Boolean foundID = false, reg = false, log = false;
+    Boolean foundID = false, reg = false, log = false, notFound = false;
+    private io.ginius.cp.kt.lostfound.PreferenceManager prefManager;
 
 
     @Override
@@ -104,11 +107,13 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         cont.setVisibility(View.GONE);
         notificationType = new ArrayList<String>();
         sv.setIconified(false);
+        prefManager = new io.ginius.cp.kt.lostfound.PreferenceManager(this);
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 header.setVisibility(View.GONE);
                 idQuery = query;
+                prefManager.setDocId(idQuery);
                 imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(sv.getApplicationWindowToken(), 0);
                 try {
@@ -168,62 +173,11 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         cont.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Dialog dialog = new Dialog(MainActivity.this);
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog.setContentView(R.layout.register);
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialog.setCanceledOnTouchOutside(false);
-                RelativeLayout bg = dialog.findViewById(R.id.image);
-                final EditText ETphone = dialog.findViewById(R.id.et_contact);
-                final EditText ETemail = dialog.findViewById(R.id.et_email);
-                final EditText ETpassword = dialog.findViewById(R.id.et_password);
-                TextView login = dialog.findViewById(R.id.tvlogin);
-                Button submit = dialog.findViewById(R.id.btn_submit);
-
-
-                submit.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-//                        if(email != "" && password != "" && contact != "") {
-                        if (TextUtils.isEmpty(ETemail.getText().toString()))
-                            ETemail.setError("Please enter an email address");
-
-                        else
-                            email = ETemail.getText().toString().trim();
-                        if (TextUtils.isEmpty(ETphone.getText().toString()))
-                            ETphone.setError("Please enter an email address");
-                        else{
-                            contact = ETphone.getText().toString().trim();
-                            pn = ETphone.getText().toString().trim();
-                        }
-                        if (TextUtils.isEmpty(ETpassword.getText().toString()))
-                            ETpassword.setError("Please enter an email address");
-                        else
-                            password = ETpassword.getText().toString().trim();
-                        reg = true;
-                        try {
-                            webServiceRequest(POST, getString(R.string.service_url), register(), "register");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-//                        } else
-                        dialog.dismiss();
-
-                    }
-                });
-
-                login.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dialog.dismiss();
-                        log = true;
-                        loginDialog();
-
-
-                    }
-                });
-
-                dialog.show();
+                if(prefManager.isLoggedIn()){
+                    subCont();
+                }else {
+                    regDialog();
+                }
 
 
             }
@@ -233,68 +187,12 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
             @Override
             public void onClick(View v) {
                 foundID = true;
-//                Intent intent = new Intent(mActivity, DocUpload.class);
-//                startActivity(intent);
-                final Dialog dialog = new Dialog(MainActivity.this);
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog.setContentView(R.layout.register);
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialog.setCanceledOnTouchOutside(false);
-                RelativeLayout bg = dialog.findViewById(R.id.image);
-                final EditText ETphone = dialog.findViewById(R.id.et_contact);
-                final EditText ETnames = dialog.findViewById(R.id.et_names);
-                final EditText ETemail = dialog.findViewById(R.id.et_email);
-                final EditText ETpassword = dialog.findViewById(R.id.et_password);
-                TextView login = dialog.findViewById(R.id.tvlogin);
-                Button submit = dialog.findViewById(R.id.btn_submit);
-
-
-                submit.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-//                        if(email != "" && password != "" && contact != "") {
-                        if (TextUtils.isEmpty(ETemail.getText().toString()))
-                            ETemail.setError("Please enter an email address");
-
-                        else
-                            email = ETemail.getText().toString().trim();
-                        if (TextUtils.isEmpty(ETphone.getText().toString()))
-                            ETphone.setError("Please enter an email address");
-                        else
-                            contact = ETphone.getText().toString().trim();
-                        if (TextUtils.isEmpty(ETpassword.getText().toString()))
-                            ETpassword.setError("Please enter an email address");
-                        else
-                            password = ETpassword.getText().toString().trim();
-                        if (TextUtils.isEmpty(ETnames.getText().toString()))
-                            ETnames.setError("Please enter your name");
-                        else
-                            name = ETnames.getText().toString().trim();
-
-                        try {
-                            webServiceRequest(POST, getString(R.string.service_url), register(), "register");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-//                        } else
-                        dialog.dismiss();
-
-                    }
-                });
-
-                login.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dialog.dismiss();
-                        log = true;
-                        foundID = true;
-                        loginDialog();
-
-
-                    }
-                });
-
-                dialog.show();
+                if(prefManager.isLoggedIn()) {
+                Intent intent = new Intent(mActivity, CreateDocsOne.class);
+                            startActivity(intent);
+                } else {
+                    regDialog();
+                }
 
 
             }
@@ -303,6 +201,71 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         //
 
     }
+    void regDialog(){
+        final Dialog dialog = new Dialog(MainActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.register);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCanceledOnTouchOutside(false);
+        RelativeLayout bg = dialog.findViewById(R.id.image);
+        final EditText ETphone = dialog.findViewById(R.id.et_contact);
+        final EditText ETnames = dialog.findViewById(R.id.et_names);
+        final EditText ETemail = dialog.findViewById(R.id.et_email);
+        final EditText ETpassword = dialog.findViewById(R.id.et_password);
+        TextView login = dialog.findViewById(R.id.tvlogin);
+        Button submit = dialog.findViewById(R.id.btn_submit);
+
+
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                        if(email != "" && password != "" && contact != "") {
+                if (TextUtils.isEmpty(ETemail.getText().toString()))
+                    ETemail.setError("Please enter an email address");
+
+                else{
+                    email = ETemail.getText().toString().trim();
+                    prefManager.setUserEmail(email);
+                }
+                if (TextUtils.isEmpty(ETphone.getText().toString()))
+                    ETphone.setError("Please enter an email address");
+                else
+                    contact = ETphone.getText().toString().trim();
+                if (TextUtils.isEmpty(ETpassword.getText().toString()))
+                    ETpassword.setError("Please enter an email address");
+                else
+                    password = ETpassword.getText().toString().trim();
+                if (TextUtils.isEmpty(ETnames.getText().toString()))
+                    ETnames.setError("Please enter your name");
+                else {
+                    name = ETnames.getText().toString().trim();
+                    prefManager.setUserName(name);
+                }
+
+                try {
+                    webServiceRequest(POST, getString(R.string.service_url), register(), "register");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+//                        } else
+                dialog.dismiss();
+
+            }
+        });
+
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                log = true;
+                loginDialog();
+
+
+            }
+        });
+
+        dialog.show();
+    }
 
     void loginDialog() {
         final Dialog dialog = new Dialog(MainActivity.this);
@@ -310,11 +273,34 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         dialog.setContentView(R.layout.login);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.setCanceledOnTouchOutside(false);
+        final TextView reg = dialog.findViewById(R.id.tvregister);
+        final TextView reset = dialog.findViewById(R.id.tvforgotpassword);
         final EditText ETphone = dialog.findViewById(R.id.et_contact);
         //EditText email =  dialog.findViewById(R.id.et_email);
         final EditText ETpassword = dialog.findViewById(R.id.et_password);
         //TextView login =  dialog.findViewById(R.id.tvlogin);
         Button submit = dialog.findViewById(R.id.btn_submit);
+
+        reg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                regDialog();
+                dialog.dismiss();
+
+
+            }
+        });
+
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                restDialog();
+                dialog.dismiss();
+
+
+            }
+        });
+
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -324,7 +310,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                     ETphone.setError("Please enter phone number");
                 else {
                     contact = ETphone.getText().toString().trim();
-                    pn = ETphone.getText().toString().trim();
+                    prefManager.setUserPhoneNumber(contact);
                 }
                 if (TextUtils.isEmpty(ETpassword.getText().toString()))
                     ETpassword.setError("Please enter password");
@@ -338,6 +324,118 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                     e.printStackTrace();
                 }
 //                        } else
+                dialog.dismiss();
+
+
+            }
+        });
+
+        dialog.show();
+    }
+
+    void restDialog() {
+        final Dialog dialog = new Dialog(MainActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.otp);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCanceledOnTouchOutside(false);
+        final EditText ETphone = dialog.findViewById(R.id.et_contact);
+        //EditText email =  dialog.findViewById(R.id.et_email);
+        final EditText ETpassword = dialog.findViewById(R.id.et_password);
+        //TextView login =  dialog.findViewById(R.id.tvlogin);
+        Button submit = dialog.findViewById(R.id.btn_submit);
+        Button cancel = dialog.findViewById(R.id.btn_cancel);
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                regDialog();
+                dialog.dismiss();
+
+
+            }
+        });
+
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (TextUtils.isEmpty(ETphone.getText().toString()))
+                    ETphone.setError("Please enter phone number");
+                else {
+                    contact = ETphone.getText().toString().trim();
+                    prefManager.setUserPhoneNumber(contact);
+                }
+
+                try {
+                    webServiceRequest(POST, getString(R.string.service_url), otpReq(), "forgot_password");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                dialog.dismiss();
+
+
+            }
+        });
+
+        dialog.show();
+    }
+
+    void otpDialog() {
+        final Dialog dialog = new Dialog(MainActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.otp_pass);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCanceledOnTouchOutside(false);
+        final EditText ETotp = dialog.findViewById(R.id.et_otp);
+        //EditText email =  dialog.findViewById(R.id.et_email);
+        final EditText ETpassword = dialog.findViewById(R.id.et_password);
+        TextView resend =  dialog.findViewById(R.id.tvresend);
+        Button submit = dialog.findViewById(R.id.btn_submit);
+        Button cancel = dialog.findViewById(R.id.btn_cancel);
+
+        resend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    webServiceRequest(POST, getString(R.string.service_url), otpReq(), "forgot_password");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                dialog.dismiss();
+
+
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                regDialog();
+                dialog.dismiss();
+
+
+            }
+        });
+
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (TextUtils.isEmpty(ETotp.getText().toString()))
+                    ETotp.setError("Please enter phone number");
+                else {
+                    OTP = ETotp.getText().toString().trim();
+                }
+                if (TextUtils.isEmpty(ETpassword.getText().toString()))
+                    ETpassword.setError("Please enter phone number");
+                else {
+                    password = ETpassword.getText().toString().trim();
+                }
+                try {
+                    webServiceRequest(POST, getString(R.string.service_url), resetOtpReq(), "change_password");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 dialog.dismiss();
 
 
@@ -368,6 +466,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
     }
 
     public JSONObject subscribeT0(String acct, String docType) throws JSONException {
+        //TODO make email alerts default. only add sms as an option. remove email checkbox.
         JSONObject dataW = new JSONObject();
         JSONObject dataItem = new JSONObject();
         dataItem.put(getString(R.string.doc_ref), acct);
@@ -405,6 +504,27 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         return dataW;
     }
 
+    public JSONObject otpReq() throws JSONException {
+        JSONObject dataW = new JSONObject();
+        JSONObject dataItem = new JSONObject();
+        dataItem.put(getString(R.string.contact), contact);
+        dataW.put(getString(R.string.data), dataItem);
+        dataW.put(getString(R.string.command), "forgot_password");
+        Log.e("test", dataW.toString(4));
+        return dataW;
+    }
+    public JSONObject resetOtpReq() throws JSONException {
+        JSONObject dataW = new JSONObject();
+        JSONObject dataItem = new JSONObject();
+        dataItem.put("user_id", prefManager.getUserId());
+        dataItem.put("otp", OTP);
+        dataItem.put("password", password);
+        dataW.put(getString(R.string.data), dataItem);
+        dataW.put(getString(R.string.command), "change_password");
+        Log.e("test", dataW.toString(4));
+        return dataW;
+    }
+
 //    	"doc_ref":"2" ,
 //                "amount":"10" ,
 //                "contact":"254725596227"
@@ -416,20 +536,24 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
             formatted = num.replace("0", "254");
             Log.e(TAG + "bbbbbbbbbb", formatted);
         }
-        return formatted;
+        if(formatted.length() < 12 || formatted.length() > 12)
+            Utils.dialogConfig(this, "Invalid number. Kindly make sure the number prefix is \"\" 254 \"\" and the number is 12 digits long. ");
+        else
+           return formatted;
+        return "";
     }
 
     public JSONObject payment() throws JSONException {
         JSONObject dataW = new JSONObject();
         JSONObject dataItem = new JSONObject();
-        Log.e(TAG + "aaaaaaaaa", contct);
+        Log.e(TAG + "aaaaaaaaa", prefManager.getUserPhoneNumber());
         String formatted = null;
-        if (contct.startsWith("0")) {
-            formatted = contct.replace("0", "254");
+        if (prefManager.getUserPhoneNumber().startsWith("0")) {
+            formatted = prefManager.getUserPhoneNumber().replace("0", "254");
             Log.e(TAG + "bbbbbbbbbb", formatted);
         }
-        dataItem.put("contact", formatted);
-        dataItem.put("doc_ref", docNum);
+        dataItem.put("contact",  modifyNumber(prefManager.getUserPhoneNumber()));
+        dataItem.put("doc_ref", prefManager.getDocRef());
         dataItem.put("amount", "10");
         dataW.put(getString(R.string.data), dataItem);
         dataW.put(getString(R.string.command), "make_mpesa_payment");
@@ -464,6 +588,10 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                                 subscribeResponse(response);
                             else if (reqIdentifier.equalsIgnoreCase("payment"))
                                 paymentResponse(response);
+                            else if (reqIdentifier.equalsIgnoreCase("forgot_password"))
+                                otpResponse(response);
+                            else if (reqIdentifier.equalsIgnoreCase("change_password"))
+                                chngePassResponse(response);
 
 
                         } catch (Exception ex) {
@@ -495,19 +623,22 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 initTransfersMenu(documentList);
 
                 if (documentList.length() == 0) {
-                    nsv.setVisibility(View.VISIBLE);
-                    header.setVisibility(View.INVISIBLE);
-                    desc.setVisibility(View.INVISIBLE);
-                    button.setVisibility(View.GONE);
+                    notFound = true;
                     Window window = MainActivity.this.getWindow();
                     if (Build.VERSION.SDK_INT >= 21)
                         window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.yellow));
                     toolbar.setBackgroundResource(R.color.yellow);
+                    nsv.setVisibility(View.VISIBLE);
+                    header.setVisibility(View.INVISIBLE);
+                    desc.setVisibility(View.INVISIBLE);
+                    button.setVisibility(View.GONE);
+
                     //desc.setText(getString(R.string.no_results) +" "+idQuery);
                     tv.setText("\"" + idQuery + "\"");
                     rv.setVisibility(View.GONE);
                 } else {
                     Window window = MainActivity.this.getWindow();
+                    notFound = false;
                     if (Build.VERSION.SDK_INT >= 21)
                         window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.skyblue));
                     toolbar.setBackgroundResource(R.color.skyblue);
@@ -519,7 +650,12 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 }
             } else {
                 String respMsg = jsonObject.getString(getString(R.string.statusname));
-                Toast.makeText(this, respMsg, Toast.LENGTH_LONG).show();
+                Utils.dialogConfig(this, respMsg);
+                notFound = true;
+                Window window = MainActivity.this.getWindow();
+                if (Build.VERSION.SDK_INT >= 21)
+                    window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.yellow));
+                toolbar.setBackgroundResource(R.color.yellow);
 
             }
         } catch (Exception ex) {
@@ -539,6 +675,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
             if (jsonObject.getInt(getString(R.string.statuscode)) == SUCCESS) {
                 JSONObject result = jsonObject.getJSONObject(getString(R.string.result));
                 JSONObject user = result.getJSONObject(getString(R.string.user));
+                prefManager.setIsLoggedIn(true);
                 Log.e("t", user.getString("user_id"));
                 USERID = user.getString("user_id");
                 //Toast.makeText(this, jsonObject.getString("statusname"), Toast.LENGTH_SHORT).show();
@@ -548,15 +685,13 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialog.setCanceledOnTouchOutside(false);
                 TextView text = dialog.findViewById(R.id.text);
-                 contct = user.getString("contact");
-                 pn = user.getString("contact");
-                Log.e("&&&&&&", user.getString("contact") +" "+pn);
+                prefManager.setUserId(USERID);
+                prefManager.setUserPhoneNumber(user.getString("contact"));
                 if (reg)
                     text.setText("Register successful");
                 else if (log) {
                     text.setText("Login successful");
                     name = user.getString("names");
-                    Log.e("++++", contct);
                     //Toast.makeText(mActivity, name, Toast.LENGTH_SHORT).show();
                 }
                 log = false;
@@ -569,9 +704,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                         dialog.dismiss();
                         if (foundID) {
                             Intent intent = new Intent(mActivity, CreateDocsOne.class);
-                            intent.putExtra("user_id", USERID);
-                            intent.putExtra("creator_name", name);
-                            intent.putExtra("user_contact", contct);
+                            prefManager.setUserName(name);
                             startActivity(intent);
                         } else {
                             subCont();
@@ -582,7 +715,12 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 dialog.show();
 
             } else if (jsonObject.getInt(getString(R.string.statuscode)) == 1) {
-                Utils.dialogConfig(this, jsonObject.getString("error_message"));
+                Utils.dialogErrorConfig(this, jsonObject.getString("error_message"));
+                notFound = true;
+                Window window = MainActivity.this.getWindow();
+                if (Build.VERSION.SDK_INT >= 21)
+                    window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.yellow));
+                toolbar.setBackgroundResource(R.color.yellow);
 
             }
 
@@ -645,6 +783,23 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         dialog.show();
     }
 
+    void error(){
+        notFound = true;
+        Window window = MainActivity.this.getWindow();
+        if (Build.VERSION.SDK_INT >= 21)
+            window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.yellow));
+        toolbar.setBackgroundResource(R.color.yellow);
+    }
+
+    void success(){
+        notFound = false;
+        Window window = MainActivity.this.getWindow();
+        if (Build.VERSION.SDK_INT >= 21)
+            window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.skyblue));
+        toolbar.setBackgroundResource(R.color.skyblue);
+
+    }
+
     public void subscribeResponse(JSONObject jsonObject) {
         pd.dismiss();
         getWindow().setSoftInputMode(
@@ -652,19 +807,21 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         try {
             Log.e(TAG, jsonObject.toString());
             if (jsonObject.getInt(getString(R.string.statuscode)) == SUCCESS) {
+                success();
                 final Dialog dialog = new Dialog(MainActivity.this);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setContentView(R.layout.success_dialog);
                 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialog.setCanceledOnTouchOutside(false);
                 TextView text = dialog.findViewById(R.id.text);
-                text.setText(jsonObject.getString(getString(R.string.statusname)));
+                text.setText("Subscribed successfully");
                 Button submit = dialog.findViewById(R.id.btn_next);
 
                 submit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         dialog.dismiss();
+                        notFound = false;
                         Window window = MainActivity.this.getWindow();
                         if (Build.VERSION.SDK_INT >= 21)
                             window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.skyblue));
@@ -681,7 +838,74 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 dialog.show();
             } else {
                 String respMsg = jsonObject.getString(getString(R.string.statusname));
-                Toast.makeText(this, respMsg, Toast.LENGTH_LONG).show();
+                Utils.dialogErrorConfig(this, respMsg);
+                error();
+
+            }
+        } catch (Exception ex) {
+            Log.e(TAG + " error", ex.toString());
+            Toast.makeText(this, ex.toString(), Toast.LENGTH_LONG).show();
+            ex.printStackTrace();
+//            resetLayout();
+        }
+    }
+
+    public void otpResponse(JSONObject jsonObject) {
+        pd.dismiss();
+        getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        try {
+            Log.e(TAG, jsonObject.toString());
+            if (jsonObject.getInt(getString(R.string.statuscode)) == SUCCESS) {
+                String result = String.valueOf(jsonObject.getInt("result"));
+                prefManager.setUserId(result);
+                Log.e("___-()()()-___", String.valueOf(jsonObject.getInt("result")));
+                Log.e("___-()()()-___", jsonObject.getString(getString(R.string.result)));
+                Log.e("___-@@@--___", String.valueOf(jsonObject.getInt(getString(R.string.result))));
+                Log.e("___-----___", prefManager.getUserId());
+                otpDialog();
+                success();
+            } else {
+                String respMsg = jsonObject.getString(getString(R.string.statusname));
+                Utils.dialogErrorConfig(this, respMsg);
+                error();
+
+            }
+        } catch (Exception ex) {
+            Log.e(TAG + " error", ex.toString());
+            Toast.makeText(this, ex.toString(), Toast.LENGTH_LONG).show();
+            ex.printStackTrace();
+//            resetLayout();
+        }
+    }
+
+    public void chngePassResponse (JSONObject jsonObject) {
+        pd.dismiss();
+        getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        try {
+            Log.e(TAG, jsonObject.toString());
+            if (jsonObject.getInt(getString(R.string.statuscode)) == SUCCESS) {
+                success();
+                String result = jsonObject.getString(getString(R.string.result));
+                final Dialog dialog = new Dialog(this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.success_dialog);
+                TextView transferResp = (TextView) dialog.findViewById(R.id.text);
+                transferResp.setText(result);
+                dialog.findViewById(R.id.btn_next).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                        loginDialog();
+                    }
+                });
+
+
+            } else {
+                String respMsg = jsonObject.getString("Error");
+                Utils.dialogErrorConfig(this, respMsg);
+                error();
 
             }
         } catch (Exception ex) {
@@ -699,10 +923,25 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         try {
             Log.e(TAG, jsonObject.toString(4));
             if (jsonObject.getInt(getString(R.string.statuscode)) == SUCCESS) {
+                //TODO add response
+//                "statuscode": 0,
+//                        "statusname": "success",
+//                        "result": {
+//                    "MerchantRequestID": "16812-4047789-1",
+//                            "CheckoutRequestID": "ws_CO_DMZ_50144245_13072018015138120",
+//                            "ResponseCode": "0",
+//                            "ResponseDescription": "Success. Request accepted for processing",
+//                            "CustomerMessage": "Success. Request accepted for processing"
+                JSONObject result = jsonObject.getJSONObject(getString(R.string.result));
+                String msg = result.getString("CustomerMessage");
+                Utils.dialogConfig(this, msg);
 
+
+                success();
             } else {
                 String respMsg = jsonObject.getString("error_message");
-                Utils.dialogConfig(this,respMsg);
+                Utils.dialogErrorConfig(this, respMsg);
+                error();
 
             }
         } catch (Exception ex) {
@@ -721,12 +960,21 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
             HashMap<String, String> temp = new HashMap<String, String>();
             temp.put("DocId", productdetails.getJSONObject(i).getString("_id"));
             temp.put("DocName", productdetails.getJSONObject(i).getString("doc_name"));
-            temp.put("doc_fname", productdetails.getJSONObject(i).getString("doc_fname"));
-            temp.put("doc_lname", productdetails.getJSONObject(i).getString("doc_lname"));
+//            temp.put("doc_fname", productdetails.getJSONObject(i).getString("doc_fname"));
+//            temp.put("doc_lname", productdetails.getJSONObject(i).getString("doc_lname"));
             temp.put("DocType", productdetails.getJSONObject(i).getString("doc_type"));
             temp.put("DocNum", productdetails.getJSONObject(i).getString("doc_num"));
             temp.put("DocDetails", productdetails.getJSONObject(i).getString("doc_details"));
-            docNum = productdetails.getJSONObject(i).getString("doc_num");
+
+            //prefManager.setDocId(productdetails.getJSONObject(i).getString("doc_num"));
+//            prefManager.setDocFname(productdetails.getJSONObject(i).getString("doc_fname"));
+//            prefManager.setDocLname(productdetails.getJSONObject(i).getString("doc_lname"));
+            prefManager.setDocDetails(productdetails.getJSONObject(i).getString("doc_details"));
+            prefManager.setDocRef(productdetails.getJSONObject(i).getString("doc_num"));
+            prefManager.setDocType(productdetails.getJSONObject(i).getString("doc_type"));
+            //prefManager.setDocBase64(productdetails.getJSONObject(i).getString("doc_fname"));
+            prefManager.setDocName(productdetails.getJSONObject(i).getString("doc_name"));
+
             transfersList.add(temp);
 
 
@@ -814,11 +1062,34 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
     }
 
     @Override
+    public void onBackPressed() {
+        if(notFound){
+            Window window = MainActivity.this.getWindow();
+            if (Build.VERSION.SDK_INT >= 21)
+                window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.skyblue));
+            toolbar.setBackgroundResource(R.color.skyblue);
+            desc.setVisibility(View.VISIBLE);
+            desc.setVisibility(View.VISIBLE);
+            nsv.setVisibility(View.GONE);
+        }else {
+            notFound = false;
+            super.onBackPressed();
+            finish();
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         foundID = false;
         log = false;
         reg = false;
+        if(notFound){
+            Window window = MainActivity.this.getWindow();
+            if (Build.VERSION.SDK_INT >= 21)
+                window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.yellow));
+            toolbar.setBackgroundResource(R.color.yellow);
+        }
     }
 
     @Override

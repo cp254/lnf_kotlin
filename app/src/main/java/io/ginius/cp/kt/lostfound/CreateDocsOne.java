@@ -72,6 +72,7 @@ public class CreateDocsOne extends MainBaseActivity{
     EditText fname, lname, phone, details, pickuplocation, docid, createdby;
     Spinner docType;
     Button next;
+    private io.ginius.cp.kt.lostfound.PreferenceManager prefManager;
 
 
 
@@ -93,10 +94,12 @@ public class CreateDocsOne extends MainBaseActivity{
         docType = findViewById(R.id.spinner_doc_type);
         mActivity = CreateDocsOne.this;
 
+        prefManager = new io.ginius.cp.kt.lostfound.PreferenceManager(this);
+
         try {
-            userid = getIntent().getStringExtra("user_id");
-            username = getIntent().getStringExtra("creator_name");
-            userphone = getIntent().getStringExtra("user_contact");
+            userid = prefManager.getUserId();
+            username = prefManager.getUserName();
+            userphone = prefManager.getUserPhoneNumber();
         } catch (Exception e) {
             onBackPressed();
         }
@@ -134,14 +137,12 @@ public class CreateDocsOne extends MainBaseActivity{
             public void onClick(View v) {
                 if(validate()){
                     Intent intent = new Intent(mActivity, CreateDocsTwo.class);
-                    intent.putExtra("doc_type", DOCTYPE);
-                    intent.putExtra("f_name", fname.getText().toString().trim());
-                    intent.putExtra("l_name", lname.getText().toString().trim());
-                    intent.putExtra("doc_id", docid.getText().toString().trim());
-                    intent.putExtra("comments", details.getText().toString().trim());
-                    intent.putExtra("user_id", userid);
-                    intent.putExtra("creator_name", username);
-                    intent.putExtra("user_phone", userphone);
+                    prefManager.setDocType(DOCTYPE);
+                    prefManager.setDocFname(fname.getText().toString().trim());
+                    prefManager.setDocLname(lname.getText().toString().trim());
+                    prefManager.setDocName(DOCTYPE);//TODO add logic when other options are selected on the spinner, a field to enter doc name appears
+                    prefManager.setDocId(docid.getText().toString().trim());
+                    prefManager.setDocDetails(details.getText().toString().trim());
                     startActivity(intent);
                 }
 

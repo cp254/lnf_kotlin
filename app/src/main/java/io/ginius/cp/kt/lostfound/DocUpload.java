@@ -64,6 +64,7 @@ public class DocUpload extends MainBaseActivity{
     String imageString;
     Button next, upload;
     String refDocNo, name, userId;
+    private io.ginius.cp.kt.lostfound.PreferenceManager prefManager;
 
 
 
@@ -79,6 +80,8 @@ public class DocUpload extends MainBaseActivity{
         next = findViewById(R.id.btn_next);
         upload =  findViewById(R.id.btn_upload);
         mActivity = DocUpload.this;
+        prefManager = new io.ginius.cp.kt.lostfound.PreferenceManager(this);
+
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,9 +91,9 @@ public class DocUpload extends MainBaseActivity{
             }
         });
         try {
-            refDocNo = getIntent().getStringExtra("doc_res");
-            name = getIntent().getStringExtra("image_name");
-            userId = getIntent().getStringExtra("user_id");
+            refDocNo = prefManager.getDocRef();
+            name = prefManager.getDocLname()+"_"+prefManager.getDocId();
+            userId = prefManager.getUserId();
         } catch (Exception e) {
             onBackPressed();
         }

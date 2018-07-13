@@ -20,7 +20,7 @@
             android:textSize="25dp"
             android:fontFamily="@font/montserrat_semibold"
             android:padding="30dp"
-            android:text="Login"/>
+            android:text="Enter OTP"/>
         <EditText
             android:id="@+id/et_email"
             android:hint="@string/email"
@@ -34,8 +34,8 @@
             android:visibility="gone"
             android:layout_marginBottom="16dp"/>
         <EditText
-            android:id="@+id/et_contact"
-            android:hint="07XXXXXXXX"
+            android:id="@+id/et_otp"
+            android:hint="OTP"
             android:fontFamily="@font/montserrat_bold"
             android:background="@drawable/rounded_corners_white_background"
             android:inputType="number"
@@ -44,17 +44,26 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:padding="8dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="4dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="11sp"
+            android:layout_marginBottom="16dp"
+            android:textColor="@color/text_color_normal_darker"
+            android:text="(Enter the 6 digit code that has been sent to your number.)"/>
 
         <EditText
             android:id="@+id/et_password"
-            android:hint="* * * *"
+            android:hint="New PIN"
             android:fontFamily="@font/montserrat_bold"
             android:background="@drawable/rounded_corners_white_background"
             android:textAlignment="center"
             android:inputType="numberPassword"
             android:layout_width="match_parent"
             android:layout_height="48dp"
+
             android:digits="1234567890"
             android:maxLength="4"
             android:padding="8dp"
@@ -64,9 +73,11 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/tvregister"
+            android:id="@+id/tvresend"
+            android:fontFamily="@font/montserrat_bold"
+            android:textAlignment="center"
             android:textColor="@color/text_color_normal_darker"
-            android:text="Not registered? Register HERE."/>
+            android:text="(Not received an OTP? Resend OTP.)"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -74,7 +85,7 @@
             android:gravity="center"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="24dp"
-            android:orientation="horizontal">
+            android:orientation="vertical">
             <Button
                 android:id="@+id/btn_reset"
                 android:text="Reset"
@@ -92,6 +103,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 />
+            <Button
+                android:id="@+id/btn_cancel"
+                android:text="Cancel"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/rounded_grey"
+                android:textAllCaps="false"
+                android:textColor="@color/colorWhite"
+                android:fontFamily="@font/montserrat_extrabold"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                />
 
         </LinearLayout>
 
@@ -99,6 +121,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/tvforgotpassword"
+            android:visibility="gone"
             android:layout_marginBottom="32dp"
             android:textColor="@color/text_color_normal_darker"
             android:text="Forgot Password?. Click to Reset"/>
