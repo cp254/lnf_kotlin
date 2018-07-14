@@ -34,6 +34,8 @@ public class PreferenceManager {
     private static final String LON = "longitude";
     private static final String DOC_BASE64 = "doc_photo";
 
+
+
     public PreferenceManager(Context context) {
         this._context = context;
         pref = _context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
@@ -49,13 +51,13 @@ public class PreferenceManager {
         editor.commit();
     }
 
-    public void setUserPhoneNumber(String data) {
-        editor.putString(USER_PHONE_NUMBER, data);
+    public void setUserPhoneNumber(String userPhoneNumber) {
+        editor.putString(USER_PHONE_NUMBER, userPhoneNumber);
         editor.commit();
     }
 
-    public void setUserEmail(String data) {
-        editor.putString(USER_EMAIL, data);
+    public void setUserEmail(String userEmail) {
+        editor.putString(USER_EMAIL, userEmail);
         editor.commit();
     }
 
