@@ -44,6 +44,9 @@ import io.ginius.cp.kt.lostfound.models.Result;
 
 import static android.provider.MediaStore.Images.Media.getBitmap;
 import static com.android.volley.VolleyLog.TAG;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_LNAME;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_REF;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.USER_ID;
 
 /**
  * Created by cyprian on 7/4/18.
@@ -91,9 +94,9 @@ public class DocUpload extends MainBaseActivity{
             }
         });
         try {
-            refDocNo = prefManager.getDocRef();
-            name = prefManager.getDocLname()+"_"+prefManager.getDocId();
-            userId = prefManager.getUserId();
+            refDocNo = prefManager.loadPrefs(DOC_REF, "");
+            name = prefManager.loadPrefs(DOC_LNAME,"")+"_"+prefManager.loadPrefs(DOC_LNAME, "");
+            userId = prefManager.loadPrefs(USER_ID, "");
         } catch (Exception e) {
             onBackPressed();
         }

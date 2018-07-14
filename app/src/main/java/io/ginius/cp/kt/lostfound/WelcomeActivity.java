@@ -19,6 +19,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import static io.ginius.cp.kt.lostfound.PreferenceManager.IS_FIRST_TIME_LAUNCH;
+
 public class WelcomeActivity extends AppCompatActivity {
 
     private ViewPager viewPager;
@@ -116,7 +118,7 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     private void launchHomeScreen() {
-        prefManager.setFirstTimeLaunch(false);
+        prefManager.saveBoolean(IS_FIRST_TIME_LAUNCH, false);
         startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
         finish();
     }

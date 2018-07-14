@@ -53,6 +53,14 @@ import java.util.Map;
 import io.ginius.cp.kt.lostfound.models.Result;
 
 import static com.android.volley.VolleyLog.TAG;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_DETAILS;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_FNAME;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_LNAME;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_NAME;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_TYPE;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.USER_ID;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.USER_NAME;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.USER_PHONE_NUMBER;
 
 /**
  * Created by cyprian on 7/4/18.
@@ -97,9 +105,9 @@ public class CreateDocsOne extends MainBaseActivity{
         prefManager = new io.ginius.cp.kt.lostfound.PreferenceManager(this);
 
         try {
-            userid = prefManager.getUserId();
-            username = prefManager.getUserName();
-            userphone = prefManager.getUserPhoneNumber();
+            userid = prefManager.loadPrefs(USER_ID, "");
+            username = prefManager.loadPrefs(USER_NAME, "");
+            userphone = prefManager.loadPrefs(USER_PHONE_NUMBER, "");
         } catch (Exception e) {
             onBackPressed();
         }
@@ -137,12 +145,12 @@ public class CreateDocsOne extends MainBaseActivity{
             public void onClick(View v) {
                 if(validate()){
                     Intent intent = new Intent(mActivity, CreateDocsTwo.class);
-                    prefManager.setDocType(DOCTYPE);
-                    prefManager.setDocFname(fname.getText().toString().trim());
-                    prefManager.setDocLname(lname.getText().toString().trim());
-                    prefManager.setDocName(DOCTYPE);//TODO add logic when other options are selected on the spinner, a field to enter doc name appears
-                    prefManager.setDocId(docid.getText().toString().trim());
-                    prefManager.setDocDetails(details.getText().toString().trim());
+                    prefManager.savePrefs(DOC_TYPE, DOCTYPE);
+                    prefManager.savePrefs(DOC_FNAME, fname.getText().toString().trim());
+                    prefManager.savePrefs(DOC_LNAME, lname.getText().toString().trim());
+                    prefManager.savePrefs(DOC_NAME, DOCTYPE);//TODO add logic when other options are selected on the spinner, a field to enter doc name appears also style the spinner
+                    prefManager.savePrefs(DOC_ID, docid.getText().toString().trim());
+                    prefManager.savePrefs(DOC_DETAILS, details.getText().toString().trim());
                     startActivity(intent);
                 }
 

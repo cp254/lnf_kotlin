@@ -53,6 +53,7 @@ import java.util.Locale;
 import io.ginius.cp.kt.lostfound.models.Result;
 
 import static com.android.volley.VolleyLog.TAG;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_REF;
 
 /**
  * Created by cyprian on 7/4/18.
@@ -164,17 +165,17 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
     public JSONObject createDoc() throws JSONException {
         JSONObject dataW = new JSONObject();
         JSONObject dataItem = new JSONObject();
-        dataItem.put("doc_type", prefManager.getDocType());
-        dataItem.put("doc_unique_id", prefManager.getDocId());
-        dataItem.put("doc_name", prefManager.getDocName());
-        dataItem.put("doc_details", prefManager.getDocDetails());
+        dataItem.put("doc_type", prefManager.loadPrefs(PreferenceManager.DOC_TYPE, ""));
+        dataItem.put("doc_unique_id", prefManager.loadPrefs(PreferenceManager.DOC_ID, ""));
+        dataItem.put("doc_name", prefManager.loadPrefs(PreferenceManager.DOC_TYPE, ""));
+        dataItem.put("doc_details", prefManager.loadPrefs(PreferenceManager.DOC_DETAILS, ""));
         JSONArray list = new JSONArray(loc);
         dataItem.put("coordinates", list);
-        dataItem.put("created_by", prefManager.getUserName());
+        dataItem.put("created_by", prefManager.loadPrefs(PreferenceManager.USER_NAME, ""));
         dataItem.put("pick_up_location", pickuplocation.getText().toString());
-        dataItem.put("foundby_contact", prefManager.getUserPhoneNumber());
-        dataItem.put("doc_fname", prefManager.getDocFname());
-        dataItem.put("doc_lname", prefManager.getDocLname());
+        dataItem.put("foundby_contact", prefManager.loadPrefs(PreferenceManager.DOC_TYPE, ""));
+        dataItem.put("doc_fname", prefManager.loadPrefs(PreferenceManager.DOC_FNAME, ""));
+        dataItem.put("doc_lname", prefManager.loadPrefs(PreferenceManager.DOC_LNAME, ""));
         dataW.put(getString(R.string.data), dataItem);
         dataW.put(getString(R.string.command), "create_document");
         return dataW;
@@ -239,7 +240,7 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
                     public void onClick(View view) {
                         dialog.dismiss();
                         Intent intent = new Intent(mActivity, DocUpload.class);
-                        prefManager.setDocRef(result);
+                        prefManager.savePrefs(DOC_REF, result);
                         startActivity(intent);
 //
                     }
