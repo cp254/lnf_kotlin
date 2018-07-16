@@ -50,6 +50,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -325,7 +328,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                     ETphone.setError("Please enter phone number");
                 else {
                     contact = ETphone.getText().toString().trim();
-                    prefManager.savePrefs(USER_PHONE_NUMBER,contact);
+                    prefManager.savePrefs(USER_PHONE_NUMBER, contact);
                 }
                 if (TextUtils.isEmpty(ETpassword.getText().toString()))
                     ETpassword.setError("Please enter password");
@@ -478,6 +481,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         JSONObject dataW = new JSONObject();
         JSONObject dataItem = new JSONObject();
         dataItem.put(getString(R.string.doc_ref), acct);
+        dataItem.put("userid", Integer.valueOf(prefManager.loadPrefs(USER_ID, "")));
         dataW.put(getString(R.string.data), dataItem);
         dataW.put(getString(R.string.command), getString(R.string.search_documents_by_unique_ref));
         return dataW;
@@ -548,17 +552,16 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
 //                "contact":"254725596227"
 
     private String modifyNumber(String num) {
+        String str = "";
         String formatted = "";
         Log.e(TAG + "aaaaaaaaa", num);
-        if(num.startsWith("0")) {
-            formatted = num.replace("0", "254");
-            Log.e(TAG + "bbbbbbbbbb", formatted);
-        }
-        if(formatted.length() < 12 || formatted.length() > 12)
-            Utils.dialogConfig(this, "Invalid number. Kindly make sure the number prefix is \"\" 254 \"\" and the number is 12 digits long. ");
+        str = "254"+num.substring(1);
+        Log.e(TAG + "aaaaaaaaa", str);
+        if(str.length() < 12 || str.length() > 12)
+            Utils.dialogConfig(this, "Invalid number. Kindly make sure the number prefix is \" 254 \" and the number is 12 digits long. ");
         else
-           return formatted;
-        return "";
+          formatted = str;
+        return formatted;
     }
 
     public JSONObject payment() throws JSONException {
@@ -692,6 +695,8 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 Log.e("t", user.getString("user_id"));
                 USERID = user.getString("user_id");
                 prefManager.savePrefs(USER_ID, USERID );
+                if (log)
+                    prefManager.savePrefs(USER_NAME, user.getString("names") );
                 //Toast.makeText(this, jsonObject.getString("statusname"), Toast.LENGTH_SHORT).show();
                 prefManager.savePrefs(USER_ID, USERID );
                 regResponse();
@@ -1054,14 +1059,30 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         textIdType.setText(iDType);
         textDocNo.setText("No: " + value);
         textDocNames.setText("Names: " + firstName + "  " + secondName);
+//        URL url = null;
+//        try {
+//            url = new URL("http://image10.bizrate-images.com/resize?sq=60&uid=2216744464");
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        }
+//        Bitmap bmp = null;
+//        try {
+//            bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        BitmapDrawable background = new BitmapDrawable(bmp);
+//        bg.setBackgroundDrawable(background);
+
         //bg.setBackgroundResource(R.drawable.);
-        byte[] decodedString = Base64.decode(image, Base64.NO_WRAP);
-        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-        BitmapDrawable background = new BitmapDrawable(decodedByte);
-        bg.setBackgroundDrawable(background);
-        GradientDrawable shape = new GradientDrawable();
-        shape.setCornerRadius(16);
-        bg1.setBackground(shape);
+//        byte[] decodedString = Base64.decode(image, Base64.NO_WRAP);
+//        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+//        BitmapDrawable background = new BitmapDrawable(decodedByte);
+//        bg.setBackgroundDrawable(background);
+//        GradientDrawable shape = new GradientDrawable();
+//        shape.setCornerRadius(16);
+//        bg1.setBackground(shape);
+        bg.setBackgroundResource(R.color.text_color_bold);
 
         Button btn = dialog.findViewById(R.id.button_pay);
         ImageView docIcon = dialog.findViewById(R.id.doc_icon);
@@ -1100,6 +1121,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
             toolbar.setBackgroundResource(R.color.skyblue);
             desc.setVisibility(View.VISIBLE);
             desc.setVisibility(View.VISIBLE);
+            button.setVisibility(View.VISIBLE);
             nsv.setVisibility(View.GONE);
         }else {
             notFound = false;

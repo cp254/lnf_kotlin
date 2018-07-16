@@ -96,6 +96,9 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
         setContentView(R.layout.create_doc_two);
         toolbar = findViewById(R.id.toolbar);
         mContext = getApplicationContext();
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
         pickuplocation = findViewById(R.id.et_pickup);
         myLocation = new MyLocation();
@@ -167,13 +170,13 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
         JSONObject dataItem = new JSONObject();
         dataItem.put("doc_type", prefManager.loadPrefs(PreferenceManager.DOC_TYPE, ""));
         dataItem.put("doc_unique_id", prefManager.loadPrefs(PreferenceManager.DOC_ID, ""));
-        dataItem.put("doc_name", prefManager.loadPrefs(PreferenceManager.DOC_TYPE, ""));
+        dataItem.put("doc_name", prefManager.loadPrefs(PreferenceManager.DOC_NAME, ""));
         dataItem.put("doc_details", prefManager.loadPrefs(PreferenceManager.DOC_DETAILS, ""));
         JSONArray list = new JSONArray(loc);
         dataItem.put("coordinates", list);
-        dataItem.put("created_by", prefManager.loadPrefs(PreferenceManager.USER_NAME, ""));
+        dataItem.put("created_by", prefManager.loadPrefs(PreferenceManager.USER_NAME, "Good Samaritan"));
         dataItem.put("pick_up_location", pickuplocation.getText().toString());
-        dataItem.put("foundby_contact", prefManager.loadPrefs(PreferenceManager.DOC_TYPE, ""));
+        dataItem.put("foundby_contact", prefManager.loadPrefs(PreferenceManager.USER_PHONE_NUMBER, ""));
         dataItem.put("doc_fname", prefManager.loadPrefs(PreferenceManager.DOC_FNAME, ""));
         dataItem.put("doc_lname", prefManager.loadPrefs(PreferenceManager.DOC_LNAME, ""));
         dataW.put(getString(R.string.data), dataItem);
@@ -307,7 +310,7 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
 
     @Override
     public void gotLocation(Location location) {
-        pd.show();
+//        pd.show();
         final double latitude = location.getLatitude();
         final double longitude = location.getLongitude();
         final String result = "Latitude: " + location.getLatitude() +
@@ -317,7 +320,7 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
         loc.add(longitude);
         geocoder = new Geocoder(this);
         try {
-            pd.dismiss();
+            //pd.dismiss();
             user = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
             lat=(double)user.get(0).getLatitude();
             lng=(double)user.get(0).getLongitude();
@@ -328,7 +331,7 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
             pickuplocation.setText(pickupLoc);
 
         }catch (Exception e) {
-            pd.dismiss();
+            //pd.dismiss();
             e.printStackTrace();
         }
 

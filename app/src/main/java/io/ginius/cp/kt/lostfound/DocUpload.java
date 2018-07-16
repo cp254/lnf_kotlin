@@ -78,6 +78,8 @@ public class DocUpload extends MainBaseActivity{
         setContentView(R.layout.upload_image);
         toolbar = findViewById(R.id.toolbar);
         mContext = getApplicationContext();
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         preview = findViewById(R.id.preview);
         next = findViewById(R.id.btn_next);
@@ -95,7 +97,7 @@ public class DocUpload extends MainBaseActivity{
         });
         try {
             refDocNo = prefManager.loadPrefs(DOC_REF, "");
-            name = prefManager.loadPrefs(DOC_LNAME,"")+"_"+prefManager.loadPrefs(DOC_LNAME, "");
+            name = prefManager.loadPrefs(DOC_LNAME,"")+"_"+prefManager.loadPrefs(DOC_ID, "");
             userId = prefManager.loadPrefs(USER_ID, "");
         } catch (Exception e) {
             onBackPressed();

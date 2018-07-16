@@ -60,6 +60,7 @@ import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_NAME;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_TYPE;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.USER_ID;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.USER_NAME;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_ID;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.USER_PHONE_NUMBER;
 
 /**
@@ -76,8 +77,8 @@ public class CreateDocsOne extends MainBaseActivity{
     private Activity mActivity;
     InputMethodManager imm;
     Map<String, String> typeMap;
-    String userid, username, userphone;
-    EditText fname, lname, phone, details, pickuplocation, docid, createdby;
+    String userid, username, userphone, docname;
+    EditText fname, lname, phone, details, pickuplocation, docid, createdby, docName;
     Spinner docType;
     Button next;
     private io.ginius.cp.kt.lostfound.PreferenceManager prefManager;
@@ -97,6 +98,7 @@ public class CreateDocsOne extends MainBaseActivity{
         fname = findViewById(R.id.et_fname);
         lname = findViewById(R.id.et_lnames);
         docid = findViewById(R.id.et_doc_id);
+        docName = findViewById(R.id.et_doc_name);
         details = findViewById(R.id.et_doc_details);
         next = findViewById(R.id.btn_next);
         docType = findViewById(R.id.spinner_doc_type);
@@ -123,13 +125,23 @@ public class CreateDocsOne extends MainBaseActivity{
         typeMap.put(getString(R.string.passport), "PASSPORT");
         typeMap.put(getString(R.string.dl), "DRIVING_LICENSE");
         typeMap.put(getString(R.string.others), "OTHERS");
-        ArrayAdapter<String> arrayAdapterLeaves = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, TypeList);
+        ArrayAdapter<String> arrayAdapterLeaves = new ArrayAdapter<>(this, R.layout.my_spinner, TypeList);
         docType.setAdapter(arrayAdapterLeaves);
         docType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 if (i > 0) {
                     DOCTYPE = typeMap.get(docType.getSelectedItem().toString());
+                    if(docType.getSelectedItem().toString().equalsIgnoreCase("others") || i == 4)
+                        docName.setVisibility(View.VISIBLE);
+                    else
+                        docName.setVisibility(View.GONE);
+                    if(i == 1)
+                        docname = "National ID";
+                    else  if(i == 2)
+                        docname = "Passport";
+                    else if(i == 3)
+                        docname = "Driving License";
                 }
             }
 
@@ -144,12 +156,18 @@ public class CreateDocsOne extends MainBaseActivity{
             @Override
             public void onClick(View v) {
                 if(validate()){
+
                     Intent intent = new Intent(mActivity, CreateDocsTwo.class);
                     prefManager.savePrefs(DOC_TYPE, DOCTYPE);
+                    prefManager.savePrefs(PreferenceManager.DOC_ID, docid.getText().toString().trim());
+                    Log.e("ress", docid.getText().toString());
                     prefManager.savePrefs(DOC_FNAME, fname.getText().toString().trim());
                     prefManager.savePrefs(DOC_LNAME, lname.getText().toString().trim());
-                    prefManager.savePrefs(DOC_NAME, DOCTYPE);//TODO add logic when other options are selected on the spinner, a field to enter doc name appears also style the spinner
-                    prefManager.savePrefs(DOC_ID, docid.getText().toString().trim());
+                    if(docType.getSelectedItemPosition() == 4)
+                        prefManager.savePrefs(DOC_NAME, docName.getText().toString());
+                    else
+                        prefManager.savePrefs(DOC_NAME, docname);//TODO add logic when other options are selected on the spinner, a field to enter doc name appears also style the spinner
+
                     prefManager.savePrefs(DOC_DETAILS, details.getText().toString().trim());
                     startActivity(intent);
                 }
@@ -163,27 +181,25 @@ public class CreateDocsOne extends MainBaseActivity{
 
     boolean validate(){
         boolean valid = true;
-//        fname = findViewById(R.id.et_fname);
-//        lname = findViewById(R.id.et_lnames);
-//        docid = findViewById(R.id.et_doc_id);
-//        details = findViewById(R.id.et_doc_details);
         if(TextUtils.isEmpty(fname.getText().toString())){
             fname.setError("Please enter first name");
             valid = false;
         }
 
-        if(TextUtils.isEmpty(fname.getText().toString())){
-            fname.setError("Please enter first name");
-            valid = false;
+        if(docType.getSelectedItemPosition() == 4){
+            if(TextUtils.isEmpty(docName.getText().toString())){
+                docName.setError("Please enter what kind of document it is");
+                valid = false;
+            }
         }
 
         if(TextUtils.isEmpty(lname.getText().toString())){
-            lname.setError("Please enter first name");
+            lname.setError("Please enter last name");
             valid = false;
         }
 
         if(TextUtils.isEmpty(docid.getText().toString())){
-            docid.setError("Please enter first name");
+            docid.setError("Please enter document id");
             valid = false;
         }
         
@@ -281,11 +297,10 @@ public class CreateDocsOne extends MainBaseActivity{
         }
     }
 
-
-
-
-
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
 
     @Override
     protected void onPause() {

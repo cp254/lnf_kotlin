@@ -16,7 +16,7 @@ public class PreferenceManager {
 
     // Shared preferences file name
     public static final String PREF_NAME = "io.ginius.cp.kt.lostfound";
-    public static final String IS_LOGGED_IN = "IsFirstTimeLaunch";
+    public static final String IS_LOGGED_IN = "IsLoggedIn";
     public static final String IS_FIRST_TIME_LAUNCH = "IsFirstTimeLaunch";
 
     public static final String USER_PHONE_NUMBER = "user_phone_number";
@@ -25,7 +25,7 @@ public class PreferenceManager {
     public static final String USER_EMAIL = "user_email";
 
     public static final String DOC_ID = "doc_id";
-    public static final String DOC_FNAME = "doc_id";
+    public static final String DOC_FNAME = "doc_fname";
     public static final String DOC_LNAME = "doc_lname";
     public static final String DOC_TYPE = "doc_type";
     public static final String DOC_NAME = "doc_name";
@@ -69,6 +69,23 @@ public class PreferenceManager {
     public Boolean loadBoolean(String key, Boolean value){
         Boolean data = pref.getBoolean(key, value);
         return data;
+    }
+
+    public void setFirstTimeLaunch(boolean isFirstTime) {
+        editor.putBoolean(IS_FIRST_TIME_LAUNCH, isFirstTime);
+        editor.commit();
+    }
+    public void setIsLoggedIn(boolean isLoggedIn) {
+        editor.putBoolean(IS_LOGGED_IN, isLoggedIn);
+        editor.commit();
+    }
+
+    public boolean isFirstTimeLaunch() {
+        return pref.getBoolean(IS_FIRST_TIME_LAUNCH, true);
+    }
+
+    public Boolean isLoggedIn() {
+        return pref.getBoolean(IS_LOGGED_IN, true);
     }
 
 

@@ -11,7 +11,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_icon"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -32,18 +32,30 @@
         <activity android:name=".CreateDocsOne"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.SkyBlue">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="io.ginius.cp.kt.lostfound.MainActivity" />
         </activity>
         <activity android:name=".CreateDocsTwo"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.SkyBlue">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="io.ginius.cp.kt.lostfound.CreateDocsOne" />
         </activity>
         <activity android:name=".CreateDocsThree"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.SkyBlue">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="io.ginius.cp.kt.lostfound.CreateDocsTwo" />
         </activity>
         <activity android:name=".DocUpload"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.SkyBlue">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="io.ginius.cp.kt.lostfound.CreateDocsTwo" />
         </activity>
 
         <service

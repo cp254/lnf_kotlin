@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="58dp"
         android:padding="0dp"
+        app:theme="@style/ToolbarStyle"
         style="@style/AlertDialog.AppCompat.Light"
         android:background="@color/skyblue"
         app:contentInsetLeft="0dp"
@@ -47,8 +48,9 @@
                 android:fontFamily="@font/montserrat_extrabold"
                 android:textColor="@color/colorWhite"
                 android:textSize="22dp"
-                android:text="Found document"
-                android:layout_marginLeft="32dp"/>
+                android:gravity="center"
+                android:layout_centerHorizontal="true"
+                android:text="Found document"/>
 
 
         </RelativeLayout>
@@ -134,11 +136,26 @@
 
 
         <EditText
+            android:id="@+id/et_doc_name"
+            android:hint="document name e.g school id"
+            android:fontFamily="@font/montserrat_bold"
+            android:background="@drawable/rounded_corners_white_background"
+            android:inputType="textCapWords"
+            android:visibility="gone"
+            android:textAlignment="center"
+            android:textAllCaps="true"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:padding="8dp"
+            android:layout_marginBottom="24dp"/>
+
+
+        <EditText
             android:id="@+id/et_doc_id"
             android:hint="document id"
             android:fontFamily="@font/montserrat_bold"
             android:background="@drawable/rounded_corners_white_background"
-            android:inputType="number"
+            android:inputType="textCapCharacters"
             android:textAlignment="center"
             android:textAllCaps="true"
             android:layout_width="match_parent"
@@ -153,7 +170,7 @@
             android:hint="comments"
             android:fontFamily="@font/montserrat_bold"
             android:background="@drawable/rounded_corners_white_background"
-            android:inputType="number"
+            android:inputType="textCapSentences"
             android:textAlignment="center"
             android:textAllCaps="true"
             android:layout_width="match_parent"
