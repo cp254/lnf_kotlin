@@ -45,6 +45,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -480,10 +481,10 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
     public JSONObject searchId(String acct) throws JSONException {
         JSONObject dataW = new JSONObject();
         JSONObject dataItem = new JSONObject();
-        dataItem.put(getString(R.string.doc_ref), acct);
+        dataItem.put("doc_unique_id", acct);
         dataItem.put("userid", Integer.valueOf(prefManager.loadPrefs(USER_ID, "")));
         dataW.put(getString(R.string.data), dataItem);
-        dataW.put(getString(R.string.command), getString(R.string.search_documents_by_unique_ref));
+        dataW.put(getString(R.string.command), "view_document_by_unique_ref");
         return dataW;
     }
 
@@ -546,10 +547,6 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         Log.e("test", dataW.toString(4));
         return dataW;
     }
-
-//    	"doc_ref":"2" ,
-//                "amount":"10" ,
-//                "contact":"254725596227"
 
     private String modifyNumber(String num) {
         String str = "";
@@ -633,10 +630,51 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         try {
             Log.e(TAG, jsonObject.toString());
+            transfersList = new ArrayList<HashMap<String, String>>();
             if (jsonObject.getInt(getString(R.string.statuscode)) == SUCCESS) {
-                JSONArray documentList = jsonObject.getJSONArray(getString(R.string.result));
+                JSONObject documentList = jsonObject.getJSONObject(getString(R.string.result));
+                JSONObject doc = documentList.getJSONObject("doc");
+                JSONObject location = doc.getJSONObject("location");
+                JSONArray coordinates = location.getJSONArray("coordinates");
+                String lat = String.valueOf(coordinates.getDouble(0));
+                String lon = String.valueOf(coordinates.getDouble(1));
+                Log.e("lat", lat);
+                Log.e("lon", lon);
+                String uniqueDocId = doc.getString("doc_unique_id");
+                String doc_type = doc.getString("doc_type");
+                String doc_name = doc.getString("doc_name");
+                String doc_details = doc.getString("doc_details");
+                String doc_fname = doc.getString("doc_fname");
+                String doc_lname = doc.getString("doc_lname");
+                String doc_num = String.valueOf(doc.getString("doc_num"));
+                JSONArray doc_images = documentList.getJSONArray("doc_images");
+                String image_path = "";
+                for (int i = 0; i < doc_images.length(); i++) {
+                    image_path = doc_images.getJSONObject(i).getString("image_path");
+                    Log.e("image", image_path);
+                }
+                HashMap<String, String> temp = new HashMap<String, String>();
+                temp.put("DocId", uniqueDocId);
+                temp.put("DocName", doc_name);
+                temp.put("doc_fname",doc_fname);
+                temp.put("doc_lname", doc_lname);
+                temp.put("DocType", doc_type);
+                temp.put("DocDetails", doc_details);
+                temp.put("DocImage", image_path);
+                prefManager.savePrefs(DOC_ID, uniqueDocId);
+                prefManager.savePrefs(DOC_TYPE, doc_type);
+                prefManager.savePrefs(DOC_FNAME, doc_fname);
+                prefManager.savePrefs(DOC_LNAME, doc_lname);
+                prefManager.savePrefs(DOC_NAME, doc_name);
+                prefManager.savePrefs(DOC_REF, doc_num);
+                prefManager.savePrefs(DOC_DETAILS, doc_details);
+                transfersList.add(temp);
 
-                initTransfersMenu(documentList);
+                DocSearchAdapter adapter = new DocSearchAdapter(this, transfersList);
+                adapter.setCustomButtonListner(this);
+                rv.setAdapter(adapter);
+                setListViewHeightBasedOnChildren(rv);
+                rv.deferNotifyDataSetChanged();
 
                 if (documentList.length() == 0) {
                     notFound = true;
@@ -982,35 +1020,6 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
 
         for (int i = 0; i < productdetails.length(); i++) {
             Log.e(TAG, productdetails.toString(4));
-            HashMap<String, String> temp = new HashMap<String, String>();
-            temp.put("DocId", productdetails.getJSONObject(i).getString("doc_unique_id"));
-            temp.put("DocName", productdetails.getJSONObject(i).getString("doc_name"));
-            temp.put("doc_fname", productdetails.getJSONObject(i).getString("doc_fname"));
-            temp.put("doc_lname", productdetails.getJSONObject(i).getString("doc_lname"));
-            temp.put("DocType", productdetails.getJSONObject(i).getString("doc_type"));
-            temp.put("DocDetails", productdetails.getJSONObject(i).getString("doc_details"));
-//            "_id": "5b43d11167d77a7c8131060d",
-//                    "doc_unique_id": "112233",
-//                    "doc_type": "PASSPORT",
-//                    "doc_name": "PASSPORT",
-//                    "doc_details": "",
-//                    "doc_fname": "Test",
-//                    "doc_lname": "Test",
-//                    "doc_num": 12,
-//                    "score": 1.1
-
-//            prefManager.savePrefs(DOC_NAME, productdetails.getJSONObject(i).getString("doc_name"));
-            prefManager.savePrefs(DOC_ID, productdetails.getJSONObject(i).getString("doc_unique_id"));
-            prefManager.savePrefs(DOC_TYPE, productdetails.getJSONObject(i).getString("doc_type"));
-            prefManager.savePrefs(DOC_FNAME, productdetails.getJSONObject(i).getString("doc_fname"));
-            prefManager.savePrefs(DOC_LNAME, productdetails.getJSONObject(i).getString("doc_lname"));
-            prefManager.savePrefs(DOC_NAME, productdetails.getJSONObject(i).getString("doc_name"));
-            prefManager.savePrefs(DOC_REF, productdetails.getJSONObject(i).getString("doc_num"));
-            //prefManager.savePrefs(DOC_BASE64, productdetails.getJSONObject(i).getString("doc_name"));
-            prefManager.savePrefs(DOC_DETAILS, productdetails.getJSONObject(i).getString("doc_details"));
-
-
-            transfersList.add(temp);
 
 
         }
@@ -1059,30 +1068,10 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         textIdType.setText(iDType);
         textDocNo.setText("No: " + value);
         textDocNames.setText("Names: " + firstName + "  " + secondName);
-//        URL url = null;
-//        try {
-//            url = new URL("http://image10.bizrate-images.com/resize?sq=60&uid=2216744464");
-//        } catch (MalformedURLException e) {
-//            e.printStackTrace();
-//        }
-//        Bitmap bmp = null;
-//        try {
-//            bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        BitmapDrawable background = new BitmapDrawable(bmp);
-//        bg.setBackgroundDrawable(background);
 
-        //bg.setBackgroundResource(R.drawable.);
-//        byte[] decodedString = Base64.decode(image, Base64.NO_WRAP);
-//        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-//        BitmapDrawable background = new BitmapDrawable(decodedByte);
-//        bg.setBackgroundDrawable(background);
-//        GradientDrawable shape = new GradientDrawable();
-//        shape.setCornerRadius(16);
-//        bg1.setBackground(shape);
-        bg.setBackgroundResource(R.color.text_color_bold);
+//        Picasso.with(mContext)
+//                .load("http://18.216.65.139:3000"+image)
+//                .into(bg1);
 
         Button btn = dialog.findViewById(R.id.button_pay);
         ImageView docIcon = dialog.findViewById(R.id.doc_icon);
