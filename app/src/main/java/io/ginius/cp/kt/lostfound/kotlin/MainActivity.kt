@@ -2,20 +2,17 @@ package io.ginius.cp.kt.lostfound.kotlin
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v7.widget.RecyclerView
 import butterknife.BindView
 import io.ginius.cp.kt.lostfound.kotlin.api.ApiService
 import io.reactivex.disposables.Disposable
-import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
 import android.widget.*
 import io.ginius.cp.kt.lostfound.R
-import io.ginius.cp.kt.lostfound.kotlin.adapter.DocAdapter
 import io.ginius.cp.kt.lostfound.kotlin.api.post.SearchDoc
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_main.*
 import java.util.ArrayList
 
 
@@ -40,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.content_main)
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 

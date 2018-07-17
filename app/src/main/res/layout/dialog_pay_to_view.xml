@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:corner_radius="24dp"
+    tools:context="io.ginius.cp.kt.lostfound.kotlin.Register">
+
+
+    <LinearLayout
+        android:id="@+id/ll_main_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="25dp"
+        android:background="#e7e7e7"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18dp"
+            android:fontFamily="@font/montserrat_semibold"
+            android:padding="16dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="To view where it was found, select an action"/>
+
+
+
+
+
+
+
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="32dp"
+            android:orientation="vertical">
+            <Button
+                android:id="@+id/btn_reset"
+                android:text="Reset"
+                android:visibility="gone"
+                android:textAllCaps="false"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/btn_next"
+                android:text="Pay 10 Ksh"
+                android:background="@drawable/rounded_corners_blue_bg"
+                android:textAllCaps="false"
+                android:textColor="@color/colorWhite"
+                android:fontFamily="@font/montserrat_extrabold"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textSize="11dp"
+                android:gravity="left"
+                android:visibility="gone"
+                android:text="Already paid? Enter the code sent to you below."/>
+
+            <Button
+                android:id="@+id/btn_enter_code"
+                android:text="Already paid"
+                android:background="@drawable/rounded_corners_blue_bg"
+                android:textAllCaps="false"
+                android:textColor="@color/colorWhite"
+                android:fontFamily="@font/montserrat_extrabold"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="16dp"
+
+                />
+
+            <Button
+                android:id="@+id/btn_cancel"
+                android:text="Not now"
+                android:background="@drawable/rounded_corners_yellow"
+                android:textAllCaps="false"
+                android:textColor="@color/colorWhite"
+                android:fontFamily="@font/montserrat_extrabold"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="32dp"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
+</com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout>

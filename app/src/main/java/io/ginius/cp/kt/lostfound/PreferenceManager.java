@@ -3,6 +3,8 @@ package io.ginius.cp.kt.lostfound;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import org.json.JSONArray;
+
 import static android.content.Context.MODE_PRIVATE;
 
 public class PreferenceManager {
@@ -23,6 +25,8 @@ public class PreferenceManager {
     public static final String USER_ID = "user_id";
     public static final String USER_NAME = "user_name";
     public static final String USER_EMAIL = "user_email";
+
+    public static final String SEARCH_HISTORY = "sh";
 
     public static final String DOC_ID = "doc_id";
     public static final String DOC_FNAME = "doc_fname";
@@ -78,6 +82,22 @@ public class PreferenceManager {
     public void setIsLoggedIn(boolean isLoggedIn) {
         editor.putBoolean(IS_LOGGED_IN, isLoggedIn);
         editor.commit();
+    }
+    public void setSearchHistrory(String searchHistory) {
+        editor.putString(SEARCH_HISTORY, searchHistory);
+        editor.commit();
+
+//        SharedPreferences pref = this.getSharedPreferences(getString(R.string.eapps_pref), MODE_PRIVATE);
+//        SharedPreferences.Editor editor = pref.edit();
+//        editor.putString(getString(R.string.menudata), JmenuData.toString());
+//        editor.putString(getString(R.string.widgetdata), JwidgetData.toString());
+//        editor.putString(getString(R.string.favdata), JfavData.toString());
+//        editor.putString(getString(R.string.acctdata), JacctData.toString());
+//        editor.putString(getString(R.string.userdata), JuserData.toString());
+//        editor.putString(getString(R.string.instdata), JinstData.toString());
+
+//        SharedPreferences pref = this.getSharedPreferences(getString(R.string.eapps_pref), MODE_PRIVATE);
+//        menuData = new JSONArray( pref.getString( getString(R.string.menudata), null));
     }
 
     public boolean isFirstTimeLaunch() {

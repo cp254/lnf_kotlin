@@ -4,18 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/bg"
     app:corner_radius="24dp"
     >
-    <com.makeramen.roundedimageview.RoundedImageView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/bg"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scaleType="fitCenter"
-        app:riv_corner_radius="14dip"
-        app:riv_mutate_background="true"
-        app:riv_tile_mode="repeat"
-        app:riv_oval="true" />
 
 
     <RelativeLayout
@@ -30,6 +21,7 @@
             android:id="@+id/expand"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
+            android:visibility="invisible"
             android:background="@drawable/ic_scale_white"/>
 
     <LinearLayout
@@ -85,11 +77,22 @@
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:textAllCaps="false"
-            android:text="Is this yours?"
+            android:text="It's mine."
             android:fontFamily="@font/montserrat_extrabold"
             android:textColor="@color/colorWhite"
             android:id="@+id/button_pay"
             android:background="@drawable/rounded_corners_blue_bg"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:textAllCaps="false"
+            android:text="Not mine"
+            android:fontFamily="@font/montserrat_extrabold"
+            android:textColor="@color/colorWhite"
+            android:id="@+id/button_cancel"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/rounded_corners_yellow"/>
 
 
     </LinearLayout>

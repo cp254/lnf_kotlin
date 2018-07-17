@@ -3,23 +3,28 @@ package io.ginius.cp.kt.lostfound;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +33,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -43,27 +49,20 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import io.ginius.cp.kt.lostfound.models.Result;
 
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
 import static com.android.volley.VolleyLog.TAG;
-import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_BASE64;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_DETAILS;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_FNAME;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_LNAME;
@@ -71,15 +70,17 @@ import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_NAME;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_REF;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_TYPE;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.IS_LOGGED_IN;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.SEARCH_HISTORY;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.USER_EMAIL;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.USER_ID;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.USER_NAME;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.USER_PHONE_NUMBER;
 
-public class MainActivity extends MainBaseActivity implements DocSearchAdapter.customButtonListener {
+public class MainActivity extends MainBaseActivity implements DocSearchAdapter.customButtonListener, NavigationView.OnNavigationItemSelectedListener {
 
     public int SUCCESS = 0;
     ArrayList<HashMap<String, String>> transfersList;
+    ArrayList<HashMap<String, String>> searchHistori;
     ListView rv;
     TextView desc, tv;
     SearchView sv;
@@ -90,14 +91,17 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
     ConstraintLayout header;
     String idQuery = "", contact = "", email = "", password = "", name = "", docNum = "";
     InputMethodManager imm;
+    DrawerLayout drawer;
+    ActionBarDrawerToggle toggle;
     RelativeLayout button;
     LinearLayout no_result, cont;
     NestedScrollView nsv;
     Map<String, String> typeMap;
     CheckBox cbSms, cbEmail;
     String OTP;
+    JSONArray searchHistory;
     ArrayList<String> notificationType;
-    Boolean foundID = false, reg = false, log = false, notFound = false;
+    Boolean foundID = false, reg = false, log = false, notFound = false, searchCheck = false;
     public io.ginius.cp.kt.lostfound.PreferenceManager prefManager;
 
 
@@ -109,6 +113,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
 
         rv = findViewById(R.id.rv);
         toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         desc = findViewById(R.id.tv_desc);
         sv = findViewById(R.id.searchView);
         header = findViewById(R.id.header);
@@ -125,6 +130,27 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         notificationType = new ArrayList<String>();
         sv.setIconified(false);
         prefManager = new io.ginius.cp.kt.lostfound.PreferenceManager(this);
+
+        drawer = findViewById(R.id.drawer_layout);
+
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+
+            toggle.syncState();
+            toggle.setDrawerIndicatorEnabled(true);
+            toggle.setDrawerSlideAnimationEnabled(true);
+            toggle.syncState();
+
+
+
+
+
+
+
+
+
         sv.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -133,10 +159,15 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 prefManager.savePrefs(DOC_ID, idQuery);
                 imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(sv.getApplicationWindowToken(), 0);
+                if(prefManager.loadBoolean(IS_LOGGED_IN, false) && prefManager.loadPrefs(USER_ID, "")!= ""){
+                    searchCheck = true;
                 try {
                     webServiceRequest(POST, getString(R.string.service_url), searchId(query), "search_document");
                 } catch (JSONException e) {
                     e.printStackTrace();
+                }
+                }else{
+                    loginDialog();
                 }
                 return false;
             }
@@ -154,10 +185,10 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 notificationType.clear();
                 if (cbSms.isChecked()) {
                     notificationType.add("SMS");
-
+                    Log.e("++++++", String.valueOf(notificationType));
                 } else {
-                    notificationType.clear();
-
+                    notificationType.remove("SMS");
+                    Log.e("-----", String.valueOf(notificationType));
                 }
 
                 if (cbEmail.isChecked() || cbSms.isChecked()) {
@@ -175,8 +206,10 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 notificationType.clear();
                 if (cbEmail.isChecked()) {
                     notificationType.add("EMAIL");
+                    Log.e("++++++", String.valueOf(notificationType));
                 } else {
-                    notificationType.clear();
+                    notificationType.remove("EMAIL");
+                    Log.e("-----", String.valueOf(notificationType));
                 }
                 if (cbEmail.isChecked() || cbSms.isChecked()) {
                     cont.setVisibility(View.VISIBLE);
@@ -733,8 +766,12 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 Log.e("t", user.getString("user_id"));
                 USERID = user.getString("user_id");
                 prefManager.savePrefs(USER_ID, USERID );
-                if (log)
+                if (log){
                     prefManager.savePrefs(USER_NAME, user.getString("names") );
+                    JSONArray search_history = result.getJSONArray("search_history");
+                    prefManager.savePrefs(SEARCH_HISTORY, search_history.toString());
+
+                }
                 //Toast.makeText(this, jsonObject.getString("statusname"), Toast.LENGTH_SHORT).show();
                 prefManager.savePrefs(USER_ID, USERID );
                 regResponse();
@@ -781,14 +818,19 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialog.dismiss();
+
                 if (foundID) {
+                    dialog.dismiss();
                     Intent intent = new Intent(mActivity, CreateDocsOne.class);
                     if(name!=null){
                         prefManager.savePrefs(USER_NAME, name);
                     }
                     startActivity(intent);
+                }else if(searchCheck){
+                    dialog.dismiss();
+                    searchCheck = false;
                 } else {
+                    dialog.dismiss();
                     subCont();
                 }
             }
@@ -1053,14 +1095,15 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
     @Override
     public void onButtonClickListner(int position, String value, String iDType, String firstName,
                                      String secondName, String doB, String image) {
+        Log.e("^^^^", image);
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.doc_preview_dialog);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         //dialog.getWindow().setBackgroundDrawableResource(Color.TRANSPARENT);
         // dialog.setCancelable(false);
-        RelativeLayout bg = dialog.findViewById(R.id.image);
-        com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout bg1 = dialog.findViewById(R.id.bg);
+        final RelativeLayout bg = dialog.findViewById(R.id.image);
+        final com.jcminarro.roundkornerlayout.RoundKornerRelativeLayout bg1 = dialog.findViewById(R.id.bg);
         TextView textIdType = dialog.findViewById(R.id.doc_type);
         TextView textDocNo = dialog.findViewById(R.id.doc_id);
         TextView textDocNames = dialog.findViewById(R.id.doc_names);
@@ -1069,22 +1112,44 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         textDocNo.setText("No: " + value);
         textDocNames.setText("Names: " + firstName + "  " + secondName);
 
-//        Picasso.with(mContext)
-//                .load("http://18.216.65.139:3000"+image)
-//                .into(bg1);
+        Picasso.with(this)
+                .load("http://18.216.65.139:3000"+image)
+                .into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                bg1.setBackground(new BitmapDrawable(bitmap));
+                bg.setBackground(new BitmapDrawable(bitmap));
+                pd.dismiss();
+            }
 
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                pd.dismiss();
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+                pd.show();
+
+            }
+        });
+
+        Button cncl = dialog.findViewById(R.id.button_cancel);
         Button btn = dialog.findViewById(R.id.button_pay);
         ImageView docIcon = dialog.findViewById(R.id.doc_icon);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
-                try {
-                    webServiceRequest(POST, getString(R.string.service_url), payment(), "payment");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                payToViewDialog();
 
+
+            }
+        });
+        cncl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
 
             }
         });
@@ -1097,6 +1162,176 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
             }
         });
 
+        dialog.show();
+
+    }
+
+    void payToViewDialog(){
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_pay_to_view);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        Button pay = dialog.findViewById(R.id.btn_next);
+        Button code = dialog.findViewById(R.id.btn_enter_code);
+        Button cncl = dialog.findViewById(R.id.btn_cancel);
+        pay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                try {
+                    webServiceRequest(POST, getString(R.string.service_url), payment(), "payment");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        });
+        code.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                enterCodeDialog();
+
+            }
+        });
+        cncl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+
+
+            }
+        });
+
+        dialog.show();
+    }
+
+    void searchHistoryDialog(){
+        searchHistori = new ArrayList<HashMap<String, String>>();
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_search_history);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        Button pay = dialog.findViewById(R.id.btn_next);
+        if(prefManager.loadPrefs(SEARCH_HISTORY, "")!=null){
+        try {
+            searchHistory = new JSONArray( prefManager.loadPrefs(SEARCH_HISTORY, ""));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        for(int i=0; i < searchHistory.length(); i++){
+            HashMap<String, String> temp = new HashMap<String, String>();
+            try {
+                temp.put("number", searchHistory.getJSONObject(i).getString("doc_ref"));
+                temp.put("date", searchHistory.getJSONObject(i).getString("viewdate"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            searchHistori.add(temp);
+
+        }}
+        ListView lv = dialog.findViewById(R.id.lv);
+        DocSearchAdapter adapter = new DocSearchAdapter(this, searchHistori);
+        adapter.setCustomButtonListner(this);
+        lv.setAdapter(adapter);
+        setListViewHeightBasedOnChildren(lv);
+        lv.deferNotifyDataSetChanged();
+
+        pay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+
+    }
+
+    public class SearchHistory extends BaseAdapter {
+
+        public ArrayList<HashMap<String, String>> list;
+        Activity activity;
+
+        public SearchHistory(Activity activity, ArrayList<HashMap<String, String>> list) {
+            super();
+            this.activity = activity;
+            this.list = list;
+        }
+
+        @Override
+        public int getCount() {
+            // TODO Auto-generated method stub
+            return list.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            // TODO Auto-generated method stub
+            return list.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent) {
+            // TODO Auto-generated method stub
+
+            LayoutInflater inflater = activity.getLayoutInflater();
+
+            if (convertView == null) {
+                convertView = inflater.inflate(R.layout.search_item, null);
+            }
+
+            TextView no = convertView.findViewById(R.id.doc_id);
+            TextView date = convertView.findViewById(R.id.doc_type);
+
+
+            final HashMap<String, String> map = list.get(position);
+
+            no.setText("ID: "+map.get("number"));
+            date.setText("Date: "+map.get("date") );
+
+
+            return convertView;
+        }
+
+
+    }
+
+    void enterCodeDialog(){
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_enter_code);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        Button pay = dialog.findViewById(R.id.btn_next);
+        final EditText etCode = dialog.findViewById(R.id.et_code);
+
+        pay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                if(TextUtils.isEmpty(etCode.getText().toString()))
+                    etCode.setError("Please enter code");
+                else {
+
+//                    try {
+//                        webServiceRequest(POST, getString(R.string.service_url), payment(), "payment");
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+                }
+
+
+            }
+        });
         dialog.show();
 
     }
@@ -1141,5 +1376,27 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         foundID = false;
         log = false;
         reg = false;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id){
+            case R.id.nav_profile:
+                Toast.makeText(this, "profile", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.nav_search_history:
+              Toast.makeText(this, "history", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.nav_logout:
+                Toast.makeText(this, "logout", Toast.LENGTH_SHORT).show();
+                break;
+
+        }
+
+
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 }
