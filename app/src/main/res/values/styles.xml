@@ -9,7 +9,7 @@
         <item name="android:fontFamily">@font/font_family</item>
     </style>
 
-    <style name="AppTheme.SkyBlue" parent="Theme.AppCompat">
+    <style name="AppTheme.SkyBlue" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/skyblue</item>
         <item name="colorPrimaryDark">@color/skybluedark</item>
@@ -21,7 +21,12 @@
 
     </style>
 
-    <style name="AppTheme.Orange" parent="Theme.AppCompat.Light">
+    <style name="AppTheme.Toolbar" parent="Theme.AppCompat">
+        <!-- Customize your theme here. -->
+
+    </style>
+
+    <style name="AppTheme.Orange" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/yellow</item>
         <item name="colorPrimaryDark">@color/yellow</item>

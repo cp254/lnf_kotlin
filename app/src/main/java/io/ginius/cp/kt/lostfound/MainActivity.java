@@ -101,7 +101,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
     String OTP;
     JSONArray searchHistory;
     ArrayList<String> notificationType;
-    Boolean foundID = false, reg = false, log = false, notFound = false, searchCheck = false;
+    Boolean foundID = false, reg = false, log = false, notFound = false, searchCheck = false, subscribe = false;
     public io.ginius.cp.kt.lostfound.PreferenceManager prefManager;
 
 
@@ -131,17 +131,17 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         sv.setIconified(false);
         prefManager = new io.ginius.cp.kt.lostfound.PreferenceManager(this);
 
-        drawer = findViewById(R.id.drawer_layout);
-
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-
-            toggle.syncState();
-            toggle.setDrawerIndicatorEnabled(true);
-            toggle.setDrawerSlideAnimationEnabled(true);
-            toggle.syncState();
+//        drawer = findViewById(R.id.drawer_layout);
+//
+//
+//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+//        drawer.setDrawerListener(toggle);
+//
+//            toggle.syncState();
+//            toggle.setDrawerIndicatorEnabled(true);
+//            toggle.setDrawerSlideAnimationEnabled(true);
+//            toggle.syncState();
 
 
 
@@ -226,6 +226,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 if(prefManager.loadBoolean(IS_LOGGED_IN, false)){
                     subCont();
                 }else {
+                    subscribe = true;
                     regDialog();
                 }
 
@@ -736,13 +737,26 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                     button.setVisibility(View.VISIBLE);
                 }
             } else {
-                String respMsg = jsonObject.getString(getString(R.string.statusname));
-                Utils.dialogConfig(this, respMsg);
+//                String respMsg = jsonObject.getString(getString(R.string.statusname));
+//                Utils.dialogConfig(this, respMsg);
+//                notFound = true;
+//                Window window = MainActivity.this.getWindow();
+//                if (Build.VERSION.SDK_INT >= 21)
+//                    window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.yellow));
+//                toolbar.setBackgroundResource(R.color.yellow);
                 notFound = true;
                 Window window = MainActivity.this.getWindow();
                 if (Build.VERSION.SDK_INT >= 21)
                     window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.yellow));
                 toolbar.setBackgroundResource(R.color.yellow);
+                nsv.setVisibility(View.VISIBLE);
+                header.setVisibility(View.INVISIBLE);
+                desc.setVisibility(View.INVISIBLE);
+                button.setVisibility(View.GONE);
+
+                //desc.setText(getString(R.string.no_results) +" "+idQuery);
+                tv.setText("\"" + idQuery + "\"");
+                rv.setVisibility(View.GONE);
 
             }
         } catch (Exception ex) {
@@ -829,9 +843,12 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 }else if(searchCheck){
                     dialog.dismiss();
                     searchCheck = false;
-                } else {
+                } else if(subscribe) {
+                    subscribe = false;
                     dialog.dismiss();
                     subCont();
+                } else{
+                    dialog.dismiss();
                 }
             }
         });
