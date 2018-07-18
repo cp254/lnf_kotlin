@@ -63,6 +63,7 @@ import java.util.Map;
 import io.ginius.cp.kt.lostfound.models.Result;
 
 import static com.android.volley.VolleyLog.TAG;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.DATEFOUND;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_DETAILS;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_FNAME;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_LNAME;
@@ -70,6 +71,11 @@ import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_NAME;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_REF;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_TYPE;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.IS_LOGGED_IN;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.LAT;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.LON;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.PICKEDBY;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.PICKEDBYCONTACT;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.PICKUPLOCATION;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.SEARCH_HISTORY;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.USER_EMAIL;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.USER_ID;
@@ -131,17 +137,17 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         sv.setIconified(false);
         prefManager = new io.ginius.cp.kt.lostfound.PreferenceManager(this);
 
-//        drawer = findViewById(R.id.drawer_layout);
-//
-//
-//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-//        drawer.setDrawerListener(toggle);
-//
-//            toggle.syncState();
-//            toggle.setDrawerIndicatorEnabled(true);
-//            toggle.setDrawerSlideAnimationEnabled(true);
-//            toggle.syncState();
+        drawer = findViewById(R.id.drawer_layout);
+
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+
+            toggle.syncState();
+            toggle.setDrawerIndicatorEnabled(true);
+            toggle.setDrawerSlideAnimationEnabled(true);
+            toggle.syncState();
 
 
 
@@ -521,6 +527,15 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         dataW.put(getString(R.string.command), "view_document_by_unique_ref");
         return dataW;
     }
+    public JSONObject pickUpCode(String pickupcode) throws JSONException {
+        JSONObject dataW = new JSONObject();
+        JSONObject dataItem = new JSONObject();
+        dataItem.put("pickupcode", Integer.valueOf(pickupcode));
+        dataItem.put("userid", Integer.valueOf(prefManager.loadPrefs(USER_ID, "")));
+        dataW.put(getString(R.string.data), dataItem);
+        dataW.put(getString(R.string.command), "view_doc_pickup_code");
+        return dataW;
+    }
 
     public JSONObject subscribeT0(String acct, String docType) throws JSONException {
         //TODO make email alerts default. only add sms as an option. remove email checkbox.
@@ -639,6 +654,8 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                                 otpResponse(response);
                             else if (reqIdentifier.equalsIgnoreCase("change_password"))
                                 chngePassResponse(response);
+                            else if (reqIdentifier.equalsIgnoreCase("pick_up_code"))
+                                pickUpCodeResponse(response);
 
 
                         } catch (Exception ex) {
@@ -657,6 +674,54 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
 //        SingletonRequestQueue.getInstance().addToRequestQueue(jor,"search_doc");
         SingletonRequestQueue.getInstance(mContext).addToRequestQueue(jor);
     }
+
+    public void pickUpCodeResponse(JSONObject jsonObject) {
+        pd.dismiss();
+        getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        try {
+            Log.e(TAG, jsonObject.toString());
+            transfersList = new ArrayList<HashMap<String, String>>();
+            if (jsonObject.getInt(getString(R.string.statuscode)) == SUCCESS) {
+                JSONObject documentDetails = jsonObject.getJSONObject(getString(R.string.result));
+                JSONObject location = documentDetails.getJSONObject("location");
+                JSONArray coordinates = location.getJSONArray("coordinates");
+                String lat = String.valueOf(coordinates.getDouble(0));
+                String lon = String.valueOf(coordinates.getDouble(1));
+                Log.e("lat", lat);
+                Log.e("lon", lon);
+                String doc_unique_id = documentDetails.getString("doc_unique_id");
+                String doc_fname = documentDetails.getString("doc_fname");
+                String doc_lname = documentDetails.getString("doc_lname");
+                String doc_name = documentDetails.getString("doc_name");
+                String created_by = documentDetails.getString("created_by");
+                String foundby_contact = documentDetails.getString("foundby_contact");
+                String createddate = documentDetails.getString("createddate");
+                String pickuplocation = documentDetails.getString("pick_up_location");
+                prefManager.savePrefs(PreferenceManager.DOC_ID, doc_unique_id);
+                prefManager.savePrefs(DOC_FNAME, doc_fname);
+                prefManager.savePrefs(DOC_LNAME, doc_lname);
+                prefManager.savePrefs(DOC_NAME, doc_name);
+                prefManager.savePrefs(PICKEDBY, created_by);
+                prefManager.savePrefs(PICKEDBYCONTACT, foundby_contact);
+                prefManager.savePrefs(LAT, lat);
+                prefManager.savePrefs(LON, lon);
+                prefManager.savePrefs(PICKUPLOCATION, pickuplocation);
+                prefManager.savePrefs(DATEFOUND, createddate);
+                Intent intent = new Intent(mActivity, ShowPickUpLocation.class);
+                startActivity(intent);
+
+
+
+
+            }else
+            {
+                Utils.dialogErrorConfig(this, "Invalid code. Try again.");
+            }
+            }catch(Exception e){
+            Log.e(TAG, e.getMessage());
+            }
+        }
 
     public void docSearchResponse(JSONObject jsonObject) {
         pd.dismiss();
@@ -919,6 +984,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
 
     void success(){
         notFound = false;
+
         Window window = MainActivity.this.getWindow();
         if (Build.VERSION.SDK_INT >= 21)
             window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.skyblue));
@@ -1022,6 +1088,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                         loginDialog();
                     }
                 });
+                dialog.show();
 
 
             } else {
@@ -1339,11 +1406,12 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                     etCode.setError("Please enter code");
                 else {
 
-//                    try {
-//                        webServiceRequest(POST, getString(R.string.service_url), payment(), "payment");
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
+                    try {
+                        webServiceRequest(POST, getString(R.string.service_url), pickUpCode(etCode.getText().toString().trim()), "pick_up_code");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
                 }
 
 

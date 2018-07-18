@@ -39,6 +39,12 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,6 +59,7 @@ import java.util.Locale;
 import io.ginius.cp.kt.lostfound.models.Result;
 
 import static com.android.volley.VolleyLog.TAG;
+import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_NAME;
 import static io.ginius.cp.kt.lostfound.PreferenceManager.DOC_REF;
 
 /**
@@ -75,6 +82,7 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
     double lat = 0;
     double lng = 0;
     EditText pickuplocation;
+    TextView docdetails;
     Boolean gpsLocation = false;
     Button next, btn_gps;
     private io.ginius.cp.kt.lostfound.PreferenceManager prefManager;
@@ -100,7 +108,11 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
+
+
+
         pickuplocation = findViewById(R.id.et_pickup);
+        docdetails = findViewById(R.id.et_doc_details);
         myLocation = new MyLocation();
         prefManager = new io.ginius.cp.kt.lostfound.PreferenceManager(this);
 
@@ -117,7 +129,7 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
             @Override
             public void onClick(View v) {
                 gpsLocation = true;
-//                Intent intent = new Intent(mActivity, CreateDocsThree.class);
+//                Intent intent = new Intent(mActivity, ShowPickUpLocation.class);
 //                startActivity(intent);
 
                 if (!canAccessLocation() || !canAccessCoreLocation()) {
@@ -151,7 +163,7 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
 
 
 
-//                    Intent intent = new Intent(mActivity, CreateDocsThree.class);
+//                    Intent intent = new Intent(mActivity, ShowPickUpLocation.class);
 //                    intent.putExtra("pick_up", pickuplocation.getText().toString().trim());
 //                    intent.putExtra("lat", lat);
 //                    intent.putExtra("lng", lng);
@@ -165,7 +177,10 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
             }
         });
     }
+
+
     public JSONObject createDoc() throws JSONException {
+//63738383
         JSONObject dataW = new JSONObject();
         JSONObject dataItem = new JSONObject();
         dataItem.put("doc_type", prefManager.loadPrefs(PreferenceManager.DOC_TYPE, ""));
@@ -175,7 +190,11 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
         JSONArray list = new JSONArray(loc);
         dataItem.put("coordinates", list);
         dataItem.put("created_by", prefManager.loadPrefs(PreferenceManager.USER_NAME, "Good Samaritan"));
-        dataItem.put("pick_up_location", pickuplocation.getText().toString());
+        if(docdetails.getText().toString()!= ""){
+           dataItem.put("pick_up_location", docdetails.getText().toString()+". "+pickuplocation.getText().toString());
+        }else {
+            dataItem.put("pick_up_location", pickuplocation.getText().toString());
+        }
         dataItem.put("foundby_contact", prefManager.loadPrefs(PreferenceManager.USER_PHONE_NUMBER, ""));
         dataItem.put("doc_fname", prefManager.loadPrefs(PreferenceManager.DOC_FNAME, ""));
         dataItem.put("doc_lname", prefManager.loadPrefs(PreferenceManager.DOC_LNAME, ""));
@@ -328,7 +347,7 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
             String area = user.get(0).getFeatureName();
             String pickupLoc = city+" "+area;
             System.out.println(" DDD lat: " +lat+",  longitude: "+lng);
-            pickuplocation.setText(pickupLoc);
+            docdetails.setText(pickupLoc);
 
         }catch (Exception e) {
             //pd.dismiss();
@@ -369,17 +388,10 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
 
     boolean validate() {
         boolean valid = true;
-        if (!(gpsLocation)) {
             if (TextUtils.isEmpty(pickuplocation.getText().toString())) {
-                pickuplocation.setError("Please enter the pickup location.");
+                pickuplocation.setError("Please enter in detail, where the owner can collect their "+prefManager.loadPrefs(DOC_NAME,""));
                 valid = false;
             }
-        } else {
-            if(lat == 0 || lng == 0){
-                Utils.dialogConfig(this, "Unable to retrieve your location. Enter the pickup location.");
-                valid = false;
-            }
-        }
         return valid;
     }
 

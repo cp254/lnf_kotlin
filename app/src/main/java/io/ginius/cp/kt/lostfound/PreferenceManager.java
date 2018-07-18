@@ -36,9 +36,12 @@ public class PreferenceManager {
     public static final String DOC_REF = "doc_ref";
     public static final String DOC_DETAILS = "doc_details";
     public static final String PICKUPLOCATION = "pick_up_location";
+    public static final String PICKEDBY = "picked_by";
+    public static final String PICKEDBYCONTACT = "picked_by_contact";
     public static final String LAT = "latitude";
     public static final String LON = "longitude";
     public static final String DOC_BASE64 = "doc_photo";
+    public static final String DATEFOUND = "date_found";
 
 
 

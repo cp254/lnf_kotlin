@@ -28,6 +28,12 @@ import android.widget.Toast;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 
 
 import org.json.JSONArray;
@@ -86,6 +92,14 @@ public class DocUpload extends MainBaseActivity{
         upload =  findViewById(R.id.btn_upload);
         mActivity = DocUpload.this;
         prefManager = new io.ginius.cp.kt.lostfound.PreferenceManager(this);
+
+        Dexter.withActivity(this)
+                .withPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                .withListener(new PermissionListener() {
+                    @Override public void onPermissionGranted(PermissionGrantedResponse response) {/* ... */}
+                    @Override public void onPermissionDenied(PermissionDeniedResponse response) {/* ... */}
+                    @Override public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
+                }).check();
 
         upload.setOnClickListener(new View.OnClickListener() {
             @Override

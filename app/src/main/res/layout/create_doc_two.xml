@@ -48,8 +48,6 @@
                 android:fontFamily="@font/montserrat_extrabold"
                 android:textColor="@color/colorWhite"
                 android:textSize="22dp"
-                android:gravity="center"
-                android:layout_centerHorizontal="true"
                 android:text="Found document"/>
 
 
@@ -84,7 +82,7 @@
 
         <EditText
             android:id="@+id/et_pickup"
-            android:hint="pick up location"
+            android:hint="e.g Mpesa shop, police station"
             android:fontFamily="@font/montserrat_bold"
             android:background="@drawable/rounded_corners_white_background"
             android:inputType="textCapSentences"
@@ -100,7 +98,7 @@
         <TextView
             android:id="@+id/et_doc_details"
             android:gravity="center"
-            android:hint="Or share your current location as the \npickup location. \n(This requires GPS and internet connection)"
+            android:hint="Share the gps location to make it easier \nto locate the document. \n(This requires GPS and internet connection)"
             android:fontFamily="@font/montserrat_bold"
             android:inputType="number"
             android:layout_width="match_parent"

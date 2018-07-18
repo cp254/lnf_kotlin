@@ -49,7 +49,6 @@
                 android:textColor="@color/colorWhite"
                 android:textSize="22dp"
                 android:gravity="center"
-                android:layout_centerHorizontal="true"
                 android:text="Found document"/>
 
 
