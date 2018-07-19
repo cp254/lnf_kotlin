@@ -189,7 +189,7 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
         dataItem.put("doc_details", prefManager.loadPrefs(PreferenceManager.DOC_DETAILS, ""));
         JSONArray list = new JSONArray(loc);
         dataItem.put("coordinates", list);
-        dataItem.put("created_by", prefManager.loadPrefs(PreferenceManager.USER_NAME, "Good Samaritan"));
+        dataItem.put("created_by", prefManager.loadPrefs(PreferenceManager.USER_NAME, ""));
         if(docdetails.getText().toString()!= ""){
            dataItem.put("pick_up_location", docdetails.getText().toString()+". "+pickuplocation.getText().toString());
         }else {
@@ -330,11 +330,11 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
     @Override
     public void gotLocation(Location location) {
 //        pd.show();
+
         final double latitude = location.getLatitude();
         final double longitude = location.getLongitude();
         final String result = "Latitude: " + location.getLatitude() +
                 " Longitude: " + location.getLongitude();
-
         loc.add(latitude);
         loc.add(longitude);
         geocoder = new Geocoder(this);
@@ -388,8 +388,12 @@ public class CreateDocsTwo extends MainBaseActivity implements LocationResult {
 
     boolean validate() {
         boolean valid = true;
+            if(loc.size() == 0){
+                loc.add(0.0);
+                loc.add(0.0);
+            }
             if (TextUtils.isEmpty(pickuplocation.getText().toString())) {
-                pickuplocation.setError("Please enter in detail, where the owner can collect their "+prefManager.loadPrefs(DOC_NAME,""));
+                pickuplocation.setError("Please enter a detailed description of where the owner can collect their "+prefManager.loadPrefs(DOC_NAME,""));
                 valid = false;
             }
         return valid;

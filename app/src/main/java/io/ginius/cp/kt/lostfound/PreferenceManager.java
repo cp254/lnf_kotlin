@@ -42,6 +42,9 @@ public class PreferenceManager {
     public static final String LON = "longitude";
     public static final String DOC_BASE64 = "doc_photo";
     public static final String DATEFOUND = "date_found";
+    public static final String COSTSUB = "cost_sub";
+    public static final String COSTNOT = "cost_not";
+
 
 
 
