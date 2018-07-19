@@ -52,17 +52,20 @@ public class SearchHistory extends BaseAdapter {
         LayoutInflater inflater = activity.getLayoutInflater();
 
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.search_item, null);
+            convertView = inflater.inflate(R.layout.history_item, null);
         }
 
         TextView no = convertView.findViewById(R.id.doc_id);
+
         TextView date = convertView.findViewById(R.id.doc_type);
 
 
         final HashMap<String, String> map = list.get(position);
 
         no.setText("ID: "+map.get("number"));
-        date.setText("Date: "+map.get("date") );
+        String full = map.get("date");
+        String edited = full.substring(0, 10);
+                date.setText("Date: "+edited);
 
 
         return convertView;

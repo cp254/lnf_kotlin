@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -37,6 +38,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -91,6 +93,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
     TextView desc, tv;
     SearchView sv;
     Toolbar toolbar;
+    TextView headerText, headerNames;
     Result docObjList[];
     private Context mContext;
     private Activity mActivity;
@@ -105,10 +108,13 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
     Map<String, String> typeMap;
     CheckBox cbSms, cbEmail;
     String OTP;
+    ImageButton ib;
     JSONArray searchHistory;
     ArrayList<String> notificationType;
     Boolean foundID = false, reg = false, log = false, notFound = false, searchCheck = false, subscribe = false;
     public io.ginius.cp.kt.lostfound.PreferenceManager prefManager;
+    private NavigationView navigationView;
+    private View HeaderView;
 
 
 
@@ -126,6 +132,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         button = findViewById(R.id.button);
         cont = findViewById(R.id.cont);
         cbSms = findViewById(R.id.cb_sms);
+        ib = toolbar.findViewById(R.id.toolbar_menu);
         cbEmail = findViewById(R.id.cb_email);
         nsv = findViewById(R.id.nsv);
         mContext = getApplicationContext();
@@ -138,22 +145,45 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         prefManager = new io.ginius.cp.kt.lostfound.PreferenceManager(this);
 
         drawer = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        HeaderView = navigationView.getHeaderView(0);
+        headerText = HeaderView.findViewById(R.id.txt);
+        headerNames = HeaderView.findViewById(R.id.tv_names);
+        headerText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //startActivity(new Intent(MainActivity.this, MyProfileSettingsActivity.class));
+            }
+        });
 
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
+        toggle.syncState();
+        toggle.setDrawerIndicatorEnabled(false);
+        toggle.setDrawerSlideAnimationEnabled(false);
+        toggle.syncState();
+        ib.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (drawer.isDrawerOpen(GravityCompat.START)) {
+                    drawer.closeDrawer(GravityCompat.START);
+                } else {
+                    drawer.openDrawer(GravityCompat.START);
+                }
+            }
+        });
 
-            toggle.syncState();
-            toggle.setDrawerIndicatorEnabled(true);
-            toggle.setDrawerSlideAnimationEnabled(true);
-            toggle.syncState();
 
 
 
 
 
-
+        if(prefManager.loadBoolean(IS_LOGGED_IN, false))
+            headerText.setText(prefManager.loadPrefs(USER_NAME, ""));
 
 
 
@@ -837,7 +867,7 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         try {
-            Log.e("t", jsonObject.toString());
+            Log.e("t", jsonObject.toString(4));
             if (jsonObject.getInt(getString(R.string.statuscode)) == SUCCESS) {
                 JSONObject result = jsonObject.getJSONObject(getString(R.string.result));
                 JSONObject user = result.getJSONObject(getString(R.string.user));
@@ -845,10 +875,16 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 Log.e("t", user.getString("user_id"));
                 USERID = user.getString("user_id");
                 prefManager.savePrefs(USER_ID, USERID );
+                String full = user.getString("names");
+                String edited= full.substring(0,1);
+                headerText.setText(edited);
+                headerNames.setText(full);
                 if (log){
-                    prefManager.savePrefs(USER_NAME, user.getString("names") );
+                    //prefManager.savePrefs(USER_NAME, user.getString("names") );
+                    headerText.setText(user.getString("names"));
                     JSONArray search_history = result.getJSONArray("search_history");
                     prefManager.savePrefs(SEARCH_HISTORY, search_history.toString());
+                    Log.e("!!!!!",  search_history.toString());
 
                 }
                 //Toast.makeText(this, jsonObject.getString("statusname"), Toast.LENGTH_SHORT).show();
@@ -1303,10 +1339,11 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         if(prefManager.loadPrefs(SEARCH_HISTORY, "")!=null){
         try {
             searchHistory = new JSONArray( prefManager.loadPrefs(SEARCH_HISTORY, ""));
+            Log.e(TAG, prefManager.loadPrefs(SEARCH_HISTORY, ""));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        for(int i=0; i < searchHistory.length(); i++){
+        try{for(int i=0; i < searchHistory.length(); i++){
             HashMap<String, String> temp = new HashMap<String, String>();
             try {
                 temp.put("number", searchHistory.getJSONObject(i).getString("doc_ref"));
@@ -1316,12 +1353,13 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
             }
             searchHistori.add(temp);
 
-        }}
+        }}catch (Exception e){
+
+        }
+        }
         ListView lv = dialog.findViewById(R.id.lv);
-        DocSearchAdapter adapter = new DocSearchAdapter(this, searchHistori);
-        adapter.setCustomButtonListner(this);
+        SearchHistory adapter = new SearchHistory(this, searchHistori);
         lv.setAdapter(adapter);
-        setListViewHeightBasedOnChildren(lv);
         lv.deferNotifyDataSetChanged();
 
         pay.setOnClickListener(new View.OnClickListener() {
@@ -1461,6 +1499,8 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
         foundID = false;
         log = false;
         reg = false;
+        if(prefManager.loadBoolean(IS_LOGGED_IN, false))
+            headerText.setText(prefManager.loadPrefs(USER_NAME, ""));
     }
 
     @Override
@@ -1472,12 +1512,13 @@ public class MainActivity extends MainBaseActivity implements DocSearchAdapter.c
                 Toast.makeText(this, "profile", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.nav_search_history:
-              Toast.makeText(this, "history", Toast.LENGTH_SHORT).show();
+              searchHistoryDialog();
                 break;
             case R.id.nav_logout:
-                Toast.makeText(this, "logout", Toast.LENGTH_SHORT).show();
+                Utils.dialogConfig(this, "Logged out");
+                SharedPreferences settings = this.getSharedPreferences("io.ginius.cp.kt.lostfound", Context.MODE_PRIVATE);
+                settings.edit().clear().apply();
                 break;
-
         }
 
 

@@ -21,15 +21,22 @@
             android:layout_height="match_parent"
             android:padding="12dp">
 
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/toolbar_menu"
+                android:background="@drawable/menu"
+                android:layout_centerVertical="true"/>
+
             <ImageView
                 android:id="@+id/tool_bar_button"
                 android:layout_width="180dp"
                 android:background="@drawable/ic_logo_white"
                 android:layout_height="match_parent"
-                android:layout_alignParentStart="true"
+                android:layout_toRightOf="@+id/toolbar_menu"
                 android:layout_alignParentTop="true"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginStart="32dp"
                 android:paddingLeft="12dp"
                 android:paddingRight="16dp"
                 android:scaleType="center" />
@@ -54,6 +61,13 @@
     <android.support.v4.widget.NestedScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#e7e7e7">
+
+        </android.support.constraint.ConstraintLayout>
 
     </android.support.v4.widget.NestedScrollView>
 
