@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Lost &amp; Found</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
     <string name="search_lost_and_found">Search for a lost ID, License or pasport by name or number</string>
     <string name="or">Or</string>
     <string name="found_a_lost_id_or_passport">Found a lost Id or Passport? Help the owner find it.</string>
