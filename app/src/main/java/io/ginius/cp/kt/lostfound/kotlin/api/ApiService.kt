@@ -5,7 +5,9 @@ import io.reactivex.Observable
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.Headers
+import retrofit2.http.POST
 
 
 interface ApiService {
@@ -20,8 +22,11 @@ interface ApiService {
 
     @POST("mobile/v1/")
     @Headers("Content-Type: application/json")
-    fun searchDoc(@Body data: io.ginius.cp.kt.lostfound.kotlin.api.post.SearchDoc.Request): Observable<io.ginius.cp.kt.lostfound.kotlin.api.post.SearchDoc.Response>
+    fun searchDoc(@Body data: io.ginius.cp.kt.lostfound.kotlin.SearchDocumentRequest): Observable<io.ginius.cp.kt.lostfound.kotlin.SearchDocumentResponse>
 
+    @POST("mobile/v1/")
+    @Headers("Content-Type: application/json")
+    fun searchHistory(@Body data: io.ginius.cp.kt.lostfound.kotlin.SearchHistoryRequest): Observable<io.ginius.cp.kt.lostfound.kotlin.SearchHistoryResponse>
 
     companion object {
         fun create(): ApiService {

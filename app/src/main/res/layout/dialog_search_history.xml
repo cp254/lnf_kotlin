@@ -28,11 +28,8 @@
             android:text="Search history"/>
 
 
-
-
-
-        <ListView
-            android:id="@+id/lv"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rc"
             android:layout_width="match_parent"
             android:background="#e7e7e7"
             android:layout_height="wrap_content"
@@ -58,7 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <Button
-                android:id="@+id/btn_next"
+                android:id="@+id/btn_close"
                 android:text="Close"
                 android:background="@drawable/rounded_corners_blue_bg"
                 android:textAllCaps="false"

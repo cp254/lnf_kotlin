@@ -22,7 +22,7 @@
                 android:fontFamily="@font/montserrat_semibold"
                 android:padding="16dp"
                 android:layout_gravity="center"
-                android:id="@+id/text"
+                android:id="@+id/msg_text"
                 android:gravity="center"
                 android:text="Successful"/>
 
